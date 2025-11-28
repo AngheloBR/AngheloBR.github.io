@@ -2,63 +2,149 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Configs base Arch / CachyOS – Anghelo BR</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Configs base para Arch / CachyOS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
   <style>
-    :root{
-      --bg:#0f172a;
-      --card:#020617;
-      --accent:#38bdf8;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --border:#1f2937;
+    :root {
+      --bg: #02040a;
+      --bg-card: #050816;
+
+      --accent: #f973a6;
+      --accent-strong: #fb2576;
+
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+
+      --radius: 14px;
     }
-    *{box-sizing:border-box;}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#1e293b 0,#020617 55%);
-      color:var(--text);
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text);
+
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 10% 0%, rgba(249,115,165,0.24) 0, transparent 55%),
+        radial-gradient(circle at 90% 0%, rgba(251,37,118,0.20) 0, transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(148,27,90,0.25) 0, transparent 60%);
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: cover;
     }
-    .page{max-width:900px;margin:0 auto;padding:32px 16px 48px;}
-    a{color:var(--accent);text-decoration:none;}
-    a:hover{text-decoration:underline;}
-    .card{
-      background:rgba(15,23,42,0.95);
-      border-radius:20px;
-      border:1px solid rgba(148,163,184,0.3);
-      padding:20px 20px 24px;
-      box-shadow:0 18px 40px rgba(0,0,0,0.65);
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
     }
-    h1{margin-top:0;font-size:1.6rem;}
-    .subtitle{color:var(--muted);margin-bottom:18px;}
-    h2{margin-top:18px;font-size:1.05rem;}
-    pre{
-      background:var(--card);
-      border-radius:10px;
-      border:1px solid var(--border);
-      padding:12px 14px;
-      font-family:ui-monospace,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-      font-size:0.85rem;
-      overflow-x:auto;
-      white-space:pre;
+
+    a:hover {
+      color: var(--accent-strong);
     }
-    .back{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      margin-bottom:16px;
-      font-size:0.85rem;
-      color:var(--muted);
+
+    .page {
+      width: min(900px, 100% - 32px);
+      margin: 0 auto;
+      padding: 16px 16px 32px;
     }
-    .back span:first-child{font-size:1rem;}
-    .note{font-size:0.85rem;color:var(--muted);margin-top:10px;}
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .back-link span:first-child {
+      font-size: 1rem;
+    }
+
+    .card {
+      background: rgba(5, 8, 22, 0.96);
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.22);
+      padding: 20px 20px 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+      backdrop-filter: blur(18px);
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    h2 {
+      margin: 18px 0 8px;
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 4px 0 10px;
+      font-size: 0.9rem;
+    }
+
+    ul {
+      margin: 4px 0 10px 20px;
+      padding: 0;
+      font-size: 0.9rem;
+    }
+
+    li { margin-bottom: 4px; }
+
+    .code-block {
+      margin: 6px 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid var(--border);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        width: 100%;
+        padding: 8px;
+      }
+
+      .card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="page">
-    <a href="./" class="back"><span>←</span><span>Volver al índice</span></a>
+    <a class="back-link" href="./">
+      <span>←</span><span>Volver al índice</span>
+    </a>
 
     <div class="card">
       <h1>Configs base para Arch / CachyOS</h1>
@@ -68,21 +154,23 @@
       </p>
 
       <h2>1. Paquetes base recomendados</h2>
-      <pre>
+      <div class="code-block">
 # Ejemplo (ajusta a tu gusto)
 sudo pacman -S --needed \
   base-devel git zsh neovim wget curl htop fastfetch \
   net-tools inetutils openssh
-      </pre>
+      </div>
 
       <h2>2. Shell y prompt</h2>
-      <pre>
-# Cambiar shell por defecto a zsh
+      <p>Cambiar la shell por defecto a <code>zsh</code>:</p>
+      <div class="code-block">
 chsh -s /usr/bin/zsh &lt;tu_usuario&gt;
+      </div>
 
-# Ejemplo: instalar Oh My Zsh y powerlevel10k (manual o AUR)
-# (aquí luego pegas tus pasos reales)
-      </pre>
+      <p>
+        Ejemplo de siguiente paso: instalar Oh My Zsh y powerlevel10k (manual o AUR)
+        y luego pegar aquí tus comandos reales cuando los tengas claros.
+      </p>
 
       <h2>3. Ideas para futuras secciones</h2>
       <ul>
