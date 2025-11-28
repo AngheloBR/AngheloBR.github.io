@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Fondo -->
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="10%" r="80%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)"/>
+
+  <!-- Borde suave -->
+  <rect x="4.8" y="4.8" width="54.4" height="54.4" rx="13"
+        fill="none" stroke="#38bdf8" stroke-opacity="0.65" stroke-width="1.2"/>
+
+  <!-- Iniciales "AB" estilo hacking -->
+  <text x="50%" y="52%"
+        text-anchor="middle"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-weight="700"
+        font-size="26"
+        fill="#e5e7eb">
+    AB
+  </text>
+
+  <!-- Punto cian pequeño (toque “lab”) -->
+  <circle cx="47" cy="18" r="3.2" fill="#38bdf8"/>
+</svg>
