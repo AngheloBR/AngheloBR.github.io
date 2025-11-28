@@ -224,7 +224,7 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;                 /* un poco más de espacio tags/botón */
+      gap: 10px;
       margin-top: 8px;
       font-size: 0.78rem;
       color: var(--muted);
@@ -232,15 +232,15 @@
 
     .card-tags {
       display: flex;
-      flex-wrap: nowrap;         /* una sola línea */
+      flex-wrap: nowrap;
       gap: 6px;
-      overflow-x: auto;          /* scroll horizontal si no entra */
+      overflow-x: auto;
       padding-bottom: 2px;
-      scrollbar-width: none;     /* Firefox: sin barra visible */
+      scrollbar-width: none;
     }
 
     .card-tags::-webkit-scrollbar {
-      display: none;             /* Chrome/Edge: sin barra visible */
+      display: none;
     }
 
     .tag {
@@ -263,9 +263,9 @@
     }
 
     .link-btn {
-      align-self: stretch;        /* ocupa todo el ancho del meta */
+      align-self: stretch;
       display: flex;
-      justify-content: center;    /* texto centrado */
+      justify-content: center;
       text-decoration: none;
       padding: 6px 10px;
       border-radius: 999px;
@@ -417,6 +417,39 @@
         tags: ["arch", "cachyos", "desktop", "linux"],
         url: "arch-configs.html",
         badge: "arch",
+      },
+
+      /* -------- NUEVAS CARDS -------- */
+
+      {
+        id: "lab-002-vpn",
+        title: "Lab 002 · VPN PC → VPS con WireGuard",
+        type: "Lab",
+        description:
+          "Configuración de una VPN sencilla desde tu PC hacia un servidor VPS con IP pública usando WireGuard, sin depender de las limitaciones del router.",
+        tags: ["debian", "lab", "vpn", "wireguard"],
+        url: "lab-002-vpn.html",
+        badge: "lab",
+      },
+      {
+        id: "lab-003-hardening",
+        title: "Lab 003 · Hardening básico en Debian 13",
+        type: "Lab",
+        description:
+          "Checklist de hardening inicial para un servidor Debian 13: usuarios, sudo, SSH, firewall y actualizaciones automáticas.",
+        tags: ["debian", "lab", "security", "hardening"],
+        url: "lab-003-hardening.html",
+        badge: "lab",
+      },
+      {
+        id: "lab-004-nas",
+        title: "Lab 004 · NAS casero con Debian",
+        type: "Lab",
+        description:
+          "Montaje de un NAS sencillo con Debian usando Samba para compartir archivos en tu red local y homelab.",
+        tags: ["debian", "lab", "nas", "storage", "homelab"],
+        url: "lab-004-nas.html",
+        badge: "lab",
       },
     ];
 
