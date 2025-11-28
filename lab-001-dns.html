@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lab 001 · Fix DNS en Debian 13 – Anghelo BR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #020617;
+      --accent: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#1e293b 0,#020617 55%);
+      color:var(--text);
+    }
+    .page{max-width:900px;margin:0 auto;padding:32px 16px 48px;}
+    a{color:var(--accent);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .card{
+      background:rgba(15,23,42,0.95);
+      border-radius:20px;
+      border:1px solid rgba(148,163,184,0.3);
+      padding:20px 20px 24px;
+      box-shadow:0 18px 40px rgba(0,0,0,0.65);
+    }
+    h1{margin-top:0;font-size:1.6rem;}
+    .subtitle{color:var(--muted);margin-bottom:18px;}
+    h2{margin-top:18px;font-size:1.05rem;}
+    pre{
+      background:var(--card);
+      border-radius:10px;
+      border:1px solid var(--border);
+      padding:12px 14px;
+      font-family:ui-monospace,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:0.85rem;
+      overflow-x:auto;
+      white-space:pre;
+    }
+    .back{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-bottom:16px;
+      font-size:0.85rem;
+      color:var(--muted);
+    }
+    .back span:first-child{font-size:1rem;}
+    .note{font-size:0.85rem;color:var(--muted);margin-top:10px;}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="./" class="back"><span>←</span><span>Volver al índice</span></a>
+
+    <div class="card">
+      <h1>Lab 001 · Fix DNS en Debian 13</h1>
+      <p class="subtitle">
+        Objetivo: resolver el error <code>Fallo temporal al resolver «deb.debian.org»</code>
+        en un servidor Debian 13, configurando correctamente los DNS.
+      </p>
+
+      <h2>1. Síntoma</h2>
+      <pre>
+sudo apt update
+# ...
+# Fallo temporal al resolver «deb.debian.org»
+      </pre>
+
+      <h2>2. Causa raíz</h2>
+      <p>
+        El archivo <code>/etc/resolv.conf</code> no existía o no tenía servidores DNS
+        configurados, por lo que el sistema no podía resolver nombres de dominio.
+      </p>
+
+      <h2>3. Remediación aplicada</h2>
+      <p>Crear un <code>/etc/resolv.conf</code> mínimo con DNS públicos:</p>
+      <pre>
+sudo sh -c 'cat > /etc/resolv.conf << "EOF"
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+EOF'
+      </pre>
+
+      <h2>4. Verificación</h2>
+      <pre>
+ping -c 4 debian.org
+sudo apt update
+      </pre>
+
+      <p class="note">
+        En un entorno más serio podrías apuntar a servidores DNS internos
+        (por ejemplo, un resolver de la propia red) en lugar de usar DNS públicos.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
