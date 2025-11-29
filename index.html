@@ -95,8 +95,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 0;      /* menos espacio respecto a Minecraft card */
-      margin-bottom: 8px;
+      margin-top: 4px;
+      margin-bottom: 10px;
     }
 
     .section-title h2 {
@@ -304,8 +304,8 @@
       background: radial-gradient(circle at top left, #1e293b, #020617);
       border-radius: 18px;
       border: 1px solid rgba(148, 163, 184, 0.25);
-      padding: 6px 20px 2px;   /* aún más compacta */
-      margin-bottom: 4px;      /* menos espacio hacia el índice */
+      padding: 12px 20px 10px;
+      margin-bottom: 10px;
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.75);
     }
 
@@ -313,7 +313,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
     .mc-status-title {
@@ -321,18 +321,17 @@
       font-weight: 600;
       color: #e5e7eb;
       margin: 0;
-      line-height: 1.1; /* reduce altura */
     }
 
+    /* Fila de info en una sola línea (desktop) */
     .mc-status-subtitle {
-      margin: 0;
+      margin: 2px 0 0;
       font-size: 0.85rem;
       color: #9ca3af;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 4px;
-      line-height: 1.1; /* reduce altura */
+      gap: 4px 10px;
     }
 
     .mc-status-subtitle code {
@@ -341,9 +340,15 @@
       color: #e5e7eb;
     }
 
-    .mc-sep {
+    .mc-chunk {
+      position: relative;
+    }
+
+    /* Separadores automáticos entre bloques, solo desktop */
+    .mc-chunk + .mc-chunk::before {
+      content: "|";
       opacity: 0.6;
-      padding: 0 4px;
+      margin-right: 8px;
     }
 
     .mc-status-pill {
@@ -415,6 +420,17 @@
       .card {
         padding: 12px 10px 10px;
       }
+
+      /* En móvil, apilar la info y quitar los separadores | */
+      .mc-status-subtitle {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+      }
+
+      .mc-chunk + .mc-chunk::before {
+        content: none;
+      }
     }
   </style>
 </head>
@@ -441,15 +457,19 @@
           <div>
             <h2 class="mc-status-title">NyxArch · Minecraft Server</h2>
             <p class="mc-status-subtitle">
-              IP: <code>nyxarch.duckdns.org</code>
-              <span class="mc-sep">|</span>
-              Versión 1.21.x
-              <span class="mc-sep">|</span>
-              Slots 20
-              <span class="mc-sep">|</span>
-              <span id="mc-status-text-inline">Chequeando estado…</span>
-              <span class="mc-sep" id="mc-status-sep-players" style="display:none;">|</span>
-              <span id="mc-status-players-inline"></span>
+              <span class="mc-chunk">
+                IP: <code>nyxarch.duckdns.org</code>
+              </span>
+              <span class="mc-chunk">
+                Versión 1.21.x
+              </span>
+              <span class="mc-chunk">
+                Slots 20
+              </span>
+              <span class="mc-chunk" id="mc-status-text-inline">
+                Chequeando estado…
+              </span>
+              <span class="mc-chunk" id="mc-status-players-inline"></span>
             </p>
           </div>
           <span id="mc-status-pill" class="mc-status-pill mc-status-loading">
@@ -504,7 +524,6 @@
       const pill = document.getElementById("mc-status-pill");
       const textInline = document.getElementById("mc-status-text-inline");
       const playersInline = document.getElementById("mc-status-players-inline");
-      const sepPlayers = document.getElementById("mc-status-sep-players");
 
       try {
         const res = await fetch(url);
@@ -521,10 +540,8 @@
           textInline.textContent = "El servidor está en línea y aceptando conexiones.";
           if (data.players) {
             playersInline.textContent = `Jugadores conectados: ${online} / ${max}`;
-            sepPlayers.style.display = "inline";
           } else {
             playersInline.textContent = "";
-            sepPlayers.style.display = "none";
           }
         } else {
           pill.textContent = "OFFLINE";
@@ -533,7 +550,6 @@
 
           textInline.textContent = "El servidor aparece como desconectado o no accesible.";
           playersInline.textContent = "";
-          sepPlayers.style.display = "none";
         }
       } catch (err) {
         pill.textContent = "ERROR";
@@ -542,7 +558,6 @@
 
         textInline.textContent = "No se pudo consultar el estado del servidor.";
         playersInline.textContent = "";
-        sepPlayers.style.display = "none";
         console.error("Error consultando estado Minecraft:", err);
       }
     }
