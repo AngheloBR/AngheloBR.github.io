@@ -14,8 +14,8 @@
       --bg-card: #050816;
 
       /* Debian pink / magenta */
-      --accent: #f973a6;          /* rosa principal */
-      --accent-strong: #fb2576;   /* más intenso para detalles */
+      --accent: #f973a6;
+      --accent-strong: #fb2576;
 
       /* Texto / bordes */
       --text: #e5e7eb;
@@ -101,7 +101,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-top: 4px;      /* ajustado */
+      margin-bottom: 10px;  /* ajustado */
     }
 
     .section-title h2 {
@@ -310,7 +311,7 @@
       border-radius: 18px;
       border: 1px solid rgba(148, 163, 184, 0.25);
       padding: 18px 20px;
-      margin-bottom: 18px;
+      margin-bottom: 10px; /* antes 18px */
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.75);
     }
 
@@ -332,6 +333,11 @@
       margin: 0;
       font-size: 0.85rem;
       color: #9ca3af;
+    }
+
+    .mc-sep {
+      opacity: 0.6;
+      padding: 0 6px;
     }
 
     .mc-status-pill {
@@ -445,7 +451,11 @@
           <div>
             <h2 class="mc-status-title">NyxArch · Minecraft Server</h2>
             <p class="mc-status-subtitle">
-              IP: <code>nyxarch.duckdns.org</code> · Versión 1.21.x · Slots 20
+              IP: <code>nyxarch.duckdns.org</code>
+              <span class="mc-sep">|</span>
+              Versión 1.21.x
+              <span class="mc-sep">|</span>
+              Slots 20
             </p>
           </div>
           <span id="mc-status-pill" class="mc-status-pill mc-status-loading">
