@@ -1,13 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Fondo oscuro con bordes redondeados -->
+  <!-- Fondo oscuro con bordes redondeados (Terminal) -->
   <rect width="64" height="64" rx="16" fill="#0a0b10"/>
   
   <!-- Borde sutil gris -->
   <rect x="2" y="2" width="60" height="60" rx="14" fill="none" stroke="#1f2937" stroke-width="2"/>
 
   <!-- Símbolo de Prompt (>) en Rosa Neón -->
-  <path d="M18 18 L42 32 L18 46" fill="none" stroke="#ff2a6d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M10 22 L22 32 L10 42" fill="none" stroke="#ff2a6d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
   
-  <!-- Cursor (_) en Cian Neón -->
-  <rect x="46" y="40" width="10" height="6" fill="#05d9e8"/>
+  <!-- Letra "A" Estilizada (Anghelo / Arch Vibe) en Cian Neón -->
+  <!-- Dibujada como una estructura abierta estilo 'tech' o logo de Arch simplificado -->
+  <path d="M30 42 L40 16 L50 42" fill="none" stroke="#05d9e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M34 34 H46" fill="none" stroke="#05d9e8" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Cursor (_) al final -->
+  <rect x="54" y="36" width="6" height="6" fill="#ff2a6d" opacity="0.8"/>
 </svg>
