@@ -1,204 +1,107 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Lab 002 · VPN PC → VPS con WireGuard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-
-  <style>
-    :root {
-      --bg: #02040a;
-      --bg-card: #020617;
-      --border: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent: #f973a6;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background-color: var(--bg);
-      background-image:
-        radial-gradient(circle at 0% 0%, rgba(148,163,255,0.18) 0, transparent 55%),
-        radial-gradient(circle at 100% 10%, rgba(56,189,248,0.14) 0, transparent 60%);
-      background-attachment: fixed;
-      background-repeat: no-repeat;
-    }
-
-    .page {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 24px 16px 32px;
-    }
-
-    a.back-link {
-      font-size: 0.85rem;
-      color: var(--muted);
-      text-decoration: none;
-    }
-    a.back-link:hover {
-      color: var(--accent);
-    }
-
-    .card {
-      margin-top: 16px;
-      background: var(--bg-card);
-      border-radius: 16px;
-      border: 1px solid rgba(148,163,184,0.35);
-      padding: 18px 20px 22px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: 1.4rem;
-    }
-    h2 {
-      margin-top: 20px;
-      font-size: 1rem;
-    }
-
-    p {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    strong { color: #e5e7eb; }
-
-    code, pre {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.8rem;
-    }
-
-    pre {
-      background: #020617;
-      border-radius: 12px;
-      border: 1px solid #111827;
-      padding: 10px 12px;
-      overflow-x: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 002 · VPN WireGuard</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { mono: ['"JetBrains Mono"', 'monospace'] },
+                    colors: { bg: '#0a0b10', card: '#11131a', accent: '#ff2a6d', dim: '#718096' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0b10;
+            background-image: linear-gradient(rgba(17, 19, 26, 0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(17, 19, 26, 0.7) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        pre { background-color: #050505; border: 1px solid #1f2937; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; color: #e2e8f0; }
+        :not(pre) > code { background-color: rgba(255, 42, 109, 0.1); color: #ff2a6d; padding: 0.2em 0.4em; border-radius: 0.3em; font-size: 0.85em; }
+    </style>
 </head>
-<body>
-  <div class="page">
-    <a href="index.html" class="back-link">← Volver al índice</a>
+<body class="text-gray-300 font-mono antialiased min-h-screen flex flex-col p-4 md:p-8">
 
-    <article class="card">
-      <header>
-        <h1>Lab 002 · VPN PC → VPS con WireGuard</h1>
-        <p>
-          Objetivo: crear una VPN sencilla entre tu PC y un servidor
-          <strong>VPS con IP pública</strong> usando WireGuard, para no depender
-          de las limitaciones del router de casa (CGNAT, puertos bloqueados, etc.).
-        </p>
-      </header>
+    <div class="max-w-4xl mx-auto w-full">
+        <div class="mb-8">
+            <a href="index.html" class="inline-flex items-center text-dim hover:text-accent transition-colors duration-200 text-sm mb-4">
+                <i class="fas fa-arrow-left mr-2"></i> Volver al índice
+            </a>
+            <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight border-b border-gray-800 pb-4">
+                <span class="text-accent">Lab 002</span> · VPN PC → VPS
+            </h1>
+            <p class="mt-4 text-gray-400">
+                Objetivo: Túnel WireGuard punto a punto entre tu PC y un VPS con IP pública para evitar restricciones de CGNAT.
+            </p>
+        </div>
 
-      <h2>1. Topología del lab</h2>
-      <p>
-        • <strong>VPS</strong>: Debian 13, IP pública (ejemplo: <code>203.0.113.10</code>).<br>
-        • <strong>PC</strong>: tu laptop/desktop con Debian o CachyOS (cliente WireGuard).<br>
-        • Solo se crea un túnel punto a punto: PC ↔ VPS.
-      </p>
+        <article class="bg-card border border-gray-800 rounded-xl p-6 md:p-10 shadow-xl space-y-8">
+            
+            <section>
+                <h2 class="text-xl font-bold text-white mb-3">1. Topología</h2>
+                <ul class="text-dim space-y-2 text-sm">
+                    <li>• <strong class="text-white">VPS:</strong> Debian 13, IP pública (ej: <code>203.0.113.10</code>).</li>
+                    <li>• <strong class="text-white">PC:</strong> Tu laptop (Debian/Arch) tras router/CGNAT.</li>
+                </ul>
+            </section>
 
-      <h2>2. Preparar el VPS (servidor WireGuard)</h2>
-      <p>En el VPS (como root o usando sudo):</p>
-
-      <pre><code># Actualizar e instalar WireGuard
-apt update &amp;&amp; apt install -y wireguard
-
-# Generar clave privada/pública del servidor
+            <section>
+                <h2 class="text-xl font-bold text-white mb-3">2. Preparar VPS (Servidor)</h2>
+                <pre><code># Instalar y generar claves
+apt update && apt install -y wireguard
 cd /etc/wireguard
 umask 077
-wg genkey | tee server.key | wg pubkey &gt; server.pub
-
-cat server.key    # guardar
-cat server.pub    # guardar</code></pre>
-
-      <p>Crear el archivo <code>/etc/wireguard/wg0.conf</code>:</p>
-
-      <pre><code>[Interface]
+wg genkey | tee server.key | wg pubkey > server.pub</code></pre>
+                
+                <p class="mt-4 mb-2 text-sm text-dim">Archivo <code>/etc/wireguard/wg0.conf</code>:</p>
+                <pre><code>[Interface]
 Address = 10.10.10.1/24
 ListenPort = 51820
 PrivateKey = &lt;contenido de server.key&gt;
-
-# Habilitar reenvío IPv4
 PostUp   = sysctl -w net.ipv4.ip_forward=1
 PostDown = sysctl -w net.ipv4.ip_forward=0</code></pre>
 
-      <pre><code># Activar el servicio
-systemctl enable wg-quick@wg0
-systemctl start  wg-quick@wg0
+                <p class="mt-4 mb-2 text-sm text-dim">Iniciar servicio:</p>
+                <pre><code>systemctl enable wg-quick@wg0
+systemctl start  wg-quick@wg0</code></pre>
+            </section>
 
-wg show    # comprobar que está levantado</code></pre>
+            <section>
+                <h2 class="text-xl font-bold text-white mb-3">3. Preparar Cliente (PC)</h2>
+                <pre><code># Instalar y claves
+sudo apt install wireguard # o pacman -S wireguard-tools
+wg genkey | tee client.key | wg pubkey > client.pub</code></pre>
+            </section>
 
-      <h2>3. Preparar el cliente (tu PC)</h2>
-      <p>En tu PC instala WireGuard (Debian/CachyOS):</p>
-
-      <pre><code># Debian/Ubuntu
-sudo apt update &amp;&amp; sudo apt install -y wireguard
-
-# En Arch/CachyOS
-sudo pacman -S wireguard-tools</code></pre>
-
-      <p>Generar claves del cliente:</p>
-
-      <pre><code>cd /etc/wireguard
-sudo umask 077
-sudo wg genkey | sudo tee client.key | wg pubkey | sudo tee client.pub
-
-sudo cat client.key
-sudo cat client.pub</code></pre>
-
-      <p>
-        Envía la <strong>clave pública del cliente</strong>
-        (<code>client.pub</code>) al VPS para añadirla como peer.
-      </p>
-
-      <h2>4. Añadir el cliente como peer en el VPS</h2>
-      <p>En el VPS, edita <code>/etc/wireguard/wg0.conf</code> y agrega al final:</p>
-
-      <pre><code>[Peer]
-PublicKey = &lt;client.pub&gt;
-AllowedIPs = 10.10.10.2/32</code></pre>
-
-      <pre><code># Reiniciar la interfaz en el VPS
-systemctl restart wg-quick@wg0</code></pre>
-
-      <h2>5. Configurar el cliente (PC)</h2>
-      <p>Crea <code>/etc/wireguard/wg0.conf</code> en tu PC:</p>
-
-      <pre><code>[Interface]
+            <section>
+                <h2 class="text-xl font-bold text-white mb-3">4. Configurar Cliente</h2>
+                <p class="mb-2 text-sm text-dim">Archivo <code>/etc/wireguard/wg0.conf</code> en tu PC:</p>
+                <pre><code>[Interface]
 Address = 10.10.10.2/32
 PrivateKey = &lt;client.key&gt;
 
 [Peer]
 PublicKey = &lt;server.pub&gt;
-Endpoint  = 203.0.113.10:51820   # IP pública del VPS
+Endpoint  = 203.0.113.10:51820
 AllowedIPs = 10.10.10.0/24
 PersistentKeepalive = 25</code></pre>
+            </section>
 
-      <pre><code># Levantar la VPN desde tu PC
-sudo wg-quick up wg0
+            <section>
+                <h2 class="text-xl font-bold text-white mb-3">5. Conectar</h2>
+                <pre><code>sudo wg-quick up wg0
+ping 10.10.10.1</code></pre>
+            </section>
 
-# Ver estado
-sudo wg
-
-# Probar ping al servidor WireGuard
-ping -c 4 10.10.10.1</code></pre>
-
-      <h2>6. Notas y mejoras</h2>
-      <p>
-        • Puedes enrutar más redes a través del VPS añadiendo más <code>AllowedIPs</code>.<br>
-        • En un entorno real, combina esto con el lab de <strong>hardening</strong> para proteger aún más el VPS.<br>
-        • Este lab está pensado para homelab y prácticas, no como diseño definitivo de producción.
-      </p>
-    </article>
-  </div>
+        </article>
+    </div>
 </body>
 </html>
