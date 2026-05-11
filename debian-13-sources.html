@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debian 13 sources.list — Jaren Bailon</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--font-mono:'JetBrains Mono',ui-monospace,monospace;--font-sans:'Inter',system-ui,sans-serif;--t:0.2s ease}
+        [data-theme="dark"]{--bg:#080a0f;--bg-elevated:#0d1117;--bg-card:#111520;--bg-code:#060810;--border:#1a1f2e;--border-strong:#252b3b;--text:#e1e7ef;--text-dim:#7e8fa8;--text-muted:#3d4a5c;--accent:#34d399;--accent-soft:rgba(52,211,153,.08);--accent-glow:rgba(52,211,153,.14);--info:#60a5fa;--warning:#fbbf24;--grid:rgba(255,255,255,.018);--shadow:0 2px 8px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.25)}
+        [data-theme="light"]{--bg:#f8fafc;--bg-elevated:#eef2f7;--bg-card:#fff;--bg-code:#1e2433;--border:#dde3ed;--border-strong:#c4cedb;--text:#0d1117;--text-dim:#4a5568;--text-muted:#9faab8;--accent:#059669;--accent-soft:rgba(5,150,105,.08);--accent-glow:rgba(5,150,105,.12);--info:#2563eb;--warning:#b45309;--grid:rgba(0,0,0,.012);--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.08)}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+        body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;transition:background var(--t),color var(--t);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px}
+        a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+        ::selection{background:var(--accent);color:#080a0f}
+        ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:5px}::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+        .container{max-width:860px;margin:0 auto;padding:0 24px}
+        .nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+        .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+        .brand{display:flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:13px;font-weight:500}
+        .brand-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent)}
+        .brand-handle{color:var(--text-dim);font-weight:400}
+        .nav-right{display:flex;align-items:center;gap:8px}
+        .nav-back{font-family:var(--font-mono);font-size:12px;padding:7px 12px;color:var(--text-dim);border-radius:6px;transition:all var(--t);display:flex;align-items:center;gap:6px}
+        .nav-back:hover{color:var(--text);background:var(--bg-elevated)}
+        .toggle-btn{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--border);border-radius:7px;color:var(--text-dim);transition:all var(--t)}
+        .toggle-btn:hover{color:var(--accent);border-color:var(--accent)}.toggle-btn svg{width:15px;height:15px}
+        [data-theme="dark"] .icon-sun{display:block}[data-theme="dark"] .icon-moon{display:none}
+        [data-theme="light"] .icon-sun{display:none}[data-theme="light"] .icon-moon{display:block}
+        .page-header{padding:52px 0 44px;border-bottom:1px solid var(--border);margin-bottom:52px}
+        .breadcrumb{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:24px}
+        .breadcrumb a{color:var(--text-dim);transition:color var(--t)}.breadcrumb a:hover{color:var(--accent)}
+        .lab-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:100px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;background:var(--accent-soft);color:var(--accent);border:1px solid rgba(52,211,153,.2)}
+        [data-theme="light"] .lab-badge{border-color:rgba(5,150,105,.2)}
+        .page-title{font-family:var(--font-sans);font-size:clamp(26px,5vw,42px);font-weight:700;line-height:1.1;letter-spacing:-.03em;margin-bottom:14px}
+        .page-title .accent{color:var(--accent)}
+        .page-desc{font-size:16px;color:var(--text-dim);max-width:680px;line-height:1.65}
+        main{padding-bottom:80px}
+        .content section{margin-bottom:48px}
+        .content h2{font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--text);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+        .step-num{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:100px}
+        .content p{color:var(--text-dim);font-size:15px;line-height:1.72;margin-bottom:12px}
+        .content ul{color:var(--text-dim);font-size:15px;line-height:1.7;list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+        .content ul li{padding-left:16px;position:relative}
+        .content ul li::before{content:'·';color:var(--accent);position:absolute;left:0;font-weight:700;font-size:18px;line-height:1.3}
+        .content strong{color:var(--text);font-weight:600}
+        pre{background:var(--bg-code);border:1px solid var(--border);border-radius:10px;padding:20px;overflow-x:auto;position:relative;margin:14px 0;font-family:var(--font-mono);font-size:13px;line-height:1.65;color:#b8c5d6}
+        code{font-family:var(--font-mono);font-size:.9em}:not(pre)>code{background:var(--accent-soft);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:.84em}
+        .copy-btn{position:absolute;top:10px;right:10px;font-family:var(--font-mono);font-size:11px;font-weight:500;padding:4px 10px;background:var(--border-strong);color:var(--text-muted);border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all var(--t)}
+        .copy-btn:hover{background:var(--accent);color:#080a0f;border-color:var(--accent)}
+        .note{padding:14px 18px;border-radius:10px;font-size:14px;line-height:1.6;margin:14px 0;display:flex;gap:12px;border:1px solid}
+        .note-body{flex:1}.note-body p{margin:0;font-size:14px}.note-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+        .note-info{background:rgba(96,165,250,.06);border-color:rgba(96,165,250,.2);color:var(--info)}.note-info .note-body p{color:var(--text-dim)}
+        .note-warning{background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.2);color:var(--warning)}.note-warning .note-body p{color:var(--text-dim)}
+        .note-success{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.2);color:var(--accent)}.note-success .note-body p{color:var(--text-dim)}
+        .repo-section{margin-bottom:8px}
+        .repo-label{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+        .lab-nav{margin-top:64px;padding-top:32px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+        .lab-nav-link{display:flex;align-items:center;gap:10px;padding:14px 18px;border:1px solid var(--border);border-radius:10px;transition:all var(--t);min-width:160px;flex:1}
+        .lab-nav-link:hover{border-color:var(--accent);background:var(--accent-soft)}
+        .lab-nav-link.next{flex-direction:row-reverse;text-align:right}
+        .lab-nav-meta{flex:1}
+        .lab-nav-label{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px}
+        .lab-nav-title{font-size:14px;font-weight:500;color:var(--text);display:block}
+        .lab-nav-link:hover .lab-nav-title{color:var(--accent)}
+        .lab-nav-arrow{color:var(--text-muted);font-size:16px;transition:transform var(--t);flex-shrink:0}
+        .lab-nav-link.prev:hover .lab-nav-arrow{transform:translateX(-3px)}
+        .lab-nav-link.next:hover .lab-nav-arrow{transform:translateX(3px)}
+        .lab-nav-center{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);padding:8px 14px;border:1px solid var(--border);border-radius:8px;transition:all var(--t);white-space:nowrap}
+        .lab-nav-center:hover{color:var(--accent);border-color:var(--accent)}
+        .footer{padding:32px 0;border-top:1px solid var(--border)}
+        .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+        .footer-brand{font-family:var(--font-mono);font-size:13px;color:var(--text-dim)}.footer-brand span{color:var(--accent)}
+        .footer-meta{font-family:var(--font-mono);font-size:12px;color:var(--text-muted)}
+        @media(max-width:768px){.container{padding:0 18px}.page-header{padding:36px 0 32px;margin-bottom:36px}.lab-nav{flex-direction:column}.lab-nav-link{min-width:100%;flex:unset;width:100%}.lab-nav-link.next{flex-direction:row;text-align:left}}
+        @media(max-width:520px){.brand-handle{display:none}}
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="container nav-inner">
+        <a href="index.html" class="brand">
+            <span class="brand-dot"></span>
+            <span>Jaren Bailon</span>
+            <span class="brand-handle">· @AngheloBR</span>
+        </a>
+        <div class="nav-right">
+            <a href="index.html#labs" class="nav-back">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Labs
+            </a>
+            <button class="toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <header class="page-header">
+            <nav class="breadcrumb">
+                <a href="index.html">Inicio</a>
+                <span>›</span>
+                <a href="index.html#labs">Labs</a>
+                <span>›</span>
+                <span>Debian 13 sources.list</span>
+            </nav>
+            <div class="lab-badge">Config · APT</div>
+            <h1 class="page-title"><span class="accent">Debian 13</span> sources.list</h1>
+            <p class="page-desc">Configuración recomendada de <code>/etc/apt/sources.list</code> para Debian 13 Trixie. Incluye repositorios principales, seguridad, actualizaciones y backports.</p>
+        </header>
+
+        <div class="content">
+            <section>
+                <h2><span class="step-num">Configuración</span> /etc/apt/sources.list</h2>
+                <p>Copia y pega esta configuración en <code>/etc/apt/sources.list</code>. Cubre todas las fuentes necesarias para un servidor Debian 13 bien mantenido:</p>
+                <pre><code># =============================================
+# Debian 13 (Trixie) - sources.list
+# =============================================
+
+# Repositorios principales
+deb https://deb.debian.org/debian trixie main contrib non-free non-free-firmware
+deb-src https://deb.debian.org/debian trixie main contrib non-free non-free-firmware
+
+# Seguridad (actualizaciones urgentes)
+deb https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+deb-src https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+
+# Actualizaciones menores estables
+deb https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware
+deb-src https://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware
+
+# Backports (versiones más nuevas de paquetes)
+deb https://deb.debian.org/debian trixie-backports main contrib non-free non-free-firmware
+deb-src https://deb.debian.org/debian trixie-backports main contrib non-free non-free-firmware</code></pre>
+            </section>
+
+            <section>
+                <h2><span class="step-num">Aplicar</span> Actualizar repositorios</h2>
+                <pre><code># Refrescar índices
+sudo apt update
+
+# Aplicar actualizaciones disponibles
+sudo apt full-upgrade -y
+
+# Instalar paquete de backports (ejemplo)
+sudo apt install -t trixie-backports &lt;paquete&gt;</code></pre>
+                <div class="note note-info">
+                    <span class="note-icon">ℹ</span>
+                    <div class="note-body"><p>El repositorio <strong>backports</strong> permite instalar versiones más recientes de software sin actualizar todo el sistema. Usa <code>-t trixie-backports</code> solo cuando necesites un paquete específico.</p></div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="step-num">Info</span> Qué incluye cada repo</h2>
+                <ul>
+                    <li><strong>main</strong> — Software libre mantenido por Debian.</li>
+                    <li><strong>contrib</strong> — Software libre que depende de paquetes non-free.</li>
+                    <li><strong>non-free</strong> — Software propietario (drivers NVIDIA, firmware, etc.).</li>
+                    <li><strong>non-free-firmware</strong> — Firmware binario para hardware (WiFi, tarjetas de red).</li>
+                    <li><strong>trixie-security</strong> — Parches de seguridad urgentes. Siempre habilitado.</li>
+                    <li><strong>trixie-updates</strong> — Correcciones no urgentes antes del próximo punto de release.</li>
+                    <li><strong>trixie-backports</strong> — Versiones más recientes de paquetes portadas desde testing.</li>
+                </ul>
+            </section>
+        </div>
+
+        <nav class="lab-nav">
+            <a href="lab-004-nas.html" class="lab-nav-link prev">
+                <span class="lab-nav-arrow">←</span>
+                <div class="lab-nav-meta">
+                    <span class="lab-nav-label">Anterior</span>
+                    <span class="lab-nav-title">Lab 004 · Home NAS</span>
+                </div>
+            </a>
+            <a href="index.html#labs" class="lab-nav-center">Todos los labs</a>
+            <a href="arch-configs.html" class="lab-nav-link next">
+                <div class="lab-nav-meta">
+                    <span class="lab-nav-label">Siguiente</span>
+                    <span class="lab-nav-title">Arch / CachyOS Configs</span>
+                </div>
+                <span class="lab-nav-arrow">→</span>
+            </a>
+        </nav>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="footer-brand">Jaren <span>Bailon</span></div>
+        <div class="footer-meta">© <span id="year">2026</span></div>
+    </div>
+</footer>
+
+<script>
+    function toggleTheme(){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}}
+    (function(){try{const s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}})();
+    document.getElementById('year').textContent=new Date().getFullYear();
+    document.querySelectorAll('pre').forEach(pre=>{const btn=document.createElement('button');btn.className='copy-btn';btn.textContent='Copiar';btn.onclick=()=>{navigator.clipboard.writeText(pre.innerText.replace(/Copiar|Copiado!/g,'').trim()).then(()=>{btn.textContent='Copiado!';setTimeout(()=>btn.textContent='Copiar',2000)})};pre.style.position='relative';pre.appendChild(btn)});
+</script>
+</body>
+</html>
