@@ -61,15 +61,13 @@
 
         'labs.eyebrow': 'cuaderno público', 'labs.title': 'Labs y notas',
         'labs.lede': 'Todo lo que aplico en el servidor de un cliente, primero lo rompo en mi homelab y lo documento aquí. En español, práctico, para copiar y pegar.',
-        'filter.all': 'Todo', 'filter.lab': 'Labs', 'filter.sec': 'Seguridad',
-        'type.config': 'Config', 'type.notes': 'Notas', 'type.guide': 'Guía', 'lab.go': 'Leer →',
+        'filter.all': 'Todo', 'filter.lab': 'Labs', 'filter.sec': 'Seguridad', 'filter.net': 'Redes',
+        'type.config': 'Config', 'lab.go': 'Leer →',
         'lab003.t': 'Hardening Debian', 'lab003.d': 'Checklist inicial de hardening para un servidor Debian 13: usuarios, sudo, SSH, firewall y actualizaciones automáticas. La misma lista que aplico en servidores de clientes.',
         'lab002.t': 'VPN PC → VPS con WireGuard', 'lab002.d': 'Túnel WireGuard directo desde tu PC a un VPS con IP pública. Sin depender del router.',
         'lab001.t': 'Arreglar DNS en Debian', 'lab001.d': 'Resolver “Temporary failure in name resolution” con un /etc/resolv.conf sano, y la solución permanente con systemd-resolved.',
         'lab004.t': 'NAS casero', 'lab004.d': 'Un NAS simple con Debian + Samba para compartir archivos en tu red local y homelab.',
         'labsrc.t': 'sources.list para Debian 13', 'labsrc.d': '/etc/apt/sources.list recomendado para Trixie: main, contrib, non-free, firmware y backports.',
-        'labarch.t': 'Configs base Arch / CachyOS', 'labarch.d': 'Setup base para CachyOS / Arch: dotfiles, terminal, zsh, powerlevel10k y bspwm.',
-        'labpy.t': 'Python para principiantes', 'labpy.d': 'Desde cero: variables, condicionales, bucles, funciones y ejercicios resueltos para estudiantes sin experiencia previa.',
         'labs.empty': 'Todavía no hay nada con ese filtro.',
 
         'about.title': 'Sobre mí',

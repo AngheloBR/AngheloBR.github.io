@@ -63,20 +63,6 @@ pre:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
 .checklist li .check { color: var(--allow); font-family: var(--font-mono); font-weight: 600; flex-shrink: 0; }
 .checklist li strong { color: var(--text); }
 
-/* ---------- toc (python guide inline) + exercises ---------- */
-.toc { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 22px 24px; margin-bottom: 48px; }
-.toc-title { font-family: var(--font-mono); font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; }
-.toc-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 20px; }
-.toc-list li a { font-size: 14px; color: var(--dim); display: flex; align-items: center; gap: 8px; padding: 4px 0; transition: color var(--t); }
-.toc-list li a:hover { color: var(--amber); }
-.toc-list li a::before { content: ''; width: 5px; height: 5px; background: var(--amber); border-radius: 50%; opacity: .7; flex-shrink: 0; }
-.exercise { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 18px; }
-.exercise-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
-.exercise-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-soft); padding: 3px 9px; border-radius: 4px; flex-shrink: 0; }
-.exercise-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text); }
-.exercise-body { padding: 18px 20px; }
-.exercise-body p { font-size: 14.5px; margin-bottom: 12px; }
-
 /* ---------- sticky side index (built by lab.js on wide screens) ---------- */
 .side-toc { display: none; position: fixed; top: 96px; left: calc(50% + 460px); width: 220px; font-family: var(--font-mono); font-size: 12px; }
 .side-toc-title { font-size: 10.5px; color: var(--mute); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }

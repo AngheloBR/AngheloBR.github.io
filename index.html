@@ -309,9 +309,7 @@
             <button class="chip active" type="button" data-filter="all" data-i18n="filter.all">All</button>
             <button class="chip" type="button" data-filter="lab" data-i18n="filter.lab">Labs</button>
             <button class="chip" type="button" data-filter="security" data-i18n="filter.sec">Security</button>
-            <button class="chip" type="button" data-filter="debian">Debian</button>
-            <button class="chip" type="button" data-filter="arch">Arch</button>
-            <button class="chip" type="button" data-filter="python">Python</button>
+            <button class="chip" type="button" data-filter="networking" data-i18n="filter.net">Networking</button>
         </div>
 
         <div class="labs-grid" id="labsGrid">
@@ -321,7 +319,7 @@
                 <p class="lab-desc" data-i18n="lab003.d">Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates. The same list I run on client servers.</p>
                 <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>security</span><span>hardening</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
             </a>
-            <a href="lab-002-vpn.html" class="lab-card reveal" data-tags="debian lab security vpn wireguard">
+            <a href="lab-002-vpn.html" class="lab-card reveal" data-tags="debian lab security networking vpn wireguard">
                 <div class="lab-top"><span class="lab-file">lab-002-vpn.html</span><span class="lab-type t-lab">Lab 002</span></div>
                 <h3 class="lab-title" data-i18n="lab002.t">VPN PC → VPS with WireGuard</h3>
                 <p class="lab-desc" data-i18n="lab002.d">A direct WireGuard tunnel from your PC to a public-IP VPS. No router involved.</p>
@@ -333,7 +331,7 @@
                 <p class="lab-desc" data-i18n="lab001.d">Resolving “Temporary failure in name resolution” with a sane /etc/resolv.conf, and the permanent fix with systemd-resolved.</p>
                 <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>dns</span><span>networking</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
             </a>
-            <a href="lab-004-nas.html" class="lab-card reveal" data-tags="debian lab nas storage">
+            <a href="lab-004-nas.html" class="lab-card reveal" data-tags="debian lab networking nas storage">
                 <div class="lab-top"><span class="lab-file">lab-004-nas.html</span><span class="lab-type t-lab">Lab 004</span></div>
                 <h3 class="lab-title" data-i18n="lab004.t">Home NAS</h3>
                 <p class="lab-desc" data-i18n="lab004.d">A simple NAS with Debian + Samba to share files across your LAN and homelab.</p>
@@ -344,18 +342,6 @@
                 <h3 class="lab-title" data-i18n="labsrc.t">Debian 13 sources.list</h3>
                 <p class="lab-desc" data-i18n="labsrc.d">Recommended /etc/apt/sources.list for Trixie: main, contrib, non-free, firmware and backports.</p>
                 <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>apt</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
-            </a>
-            <a href="arch-configs.html" class="lab-card reveal" data-tags="arch cachyos linux desktop config">
-                <div class="lab-top"><span class="lab-file">arch-configs.html</span><span class="lab-type" data-i18n="type.notes">Notes</span></div>
-                <h3 class="lab-title" data-i18n="labarch.t">Arch / CachyOS base configs</h3>
-                <p class="lab-desc" data-i18n="labarch.d">Base setup for CachyOS / Arch: dotfiles, terminal, zsh, powerlevel10k and bspwm.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>arch</span><span>cachyos</span><span>dotfiles</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
-            </a>
-            <a href="python-intro.html" class="lab-card reveal" data-tags="python beginner guide programming">
-                <div class="lab-top"><span class="lab-file">python-intro.html</span><span class="lab-type" data-i18n="type.guide">Guide</span></div>
-                <h3 class="lab-title" data-i18n="labpy.t">Python for beginners</h3>
-                <p class="lab-desc" data-i18n="labpy.d">From zero: variables, conditionals, loops, functions, and solved exercises for students with no prior programming.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>python</span><span>beginner</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
             </a>
         </div>
         <div class="labs-empty" data-i18n="labs.empty">Nothing here yet for that filter.</div>

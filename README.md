@@ -6,7 +6,8 @@ Personal site of Jaren Bailon (@AngheloBR): Linux server hardening service + pub
 
 ```
 index.html            Home (EN/ES, dark/light). Hero with a Three.js scene, diff of what changes, process, pricing, labs, about.
-lab-*.html            Labs (Spanish). arch-configs, debian-13-sources and python-intro follow the same layout.
+lab-*.html            Labs (Spanish). debian-13-sources.html follows the same layout.
+_archive/             Pages kept out of the site (Jekyll ignores _folders on GitHub Pages).
 assets/site.css       Shared tokens (colors, type), reset, nav, buttons, footer.
 assets/home.css       Home-only sections and the 3D scene shell.
 assets/lab.css        Article styles: header, content, code, callouts, side index, prev/next.
