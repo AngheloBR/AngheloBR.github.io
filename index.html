@@ -3,1007 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaren Bailon — Linux Security &amp; Hardening</title>
-    <meta name="description" content="Networks &amp; Cybersecurity student from Peru. Linux server hardening, security labs &amp; technical notes.">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>Jaren Bailon — Linux server hardening</title>
+    <meta name="description" content="I harden Linux VPS for developers, small teams and agencies: SSH keys only, root locked out, firewall, Fail2Ban, automatic updates. Every change documented in a PDF.">
+    <meta property="og:title" content="Jaren Bailon — Linux server hardening">
+    <meta property="og:description" content="Your new VPS is wide open. I close it, and hand you the paper trail.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://anghelobr.github.io/">
+    <meta name="theme-color" content="#0b0d10">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <script>
+        // Theme + language before first paint, so nothing flashes.
+        (function () {
+            var d = document.documentElement; d.classList.add('js');
+            try {
+                var t = localStorage.getItem('theme');
+                if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+                d.setAttribute('data-theme', t);
+                var l = localStorage.getItem('lang');
+                if (!l) l = (navigator.language || '').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
+                d.setAttribute('lang', l);
+            } catch (e) {}
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-            --font-serif: 'Instrument Serif', serif;
-            --font-sans: 'Inter', system-ui, sans-serif;
-            --transition: 0.2s ease;
-        }
-
-        [data-theme="dark"] {
-            --bg: #080a0f;
-            --bg-elevated: #0d1117;
-            --bg-card: #111520;
-            --border: #1a1f2e;
-            --border-strong: #252b3b;
-            --text: #e1e7ef;
-            --text-dim: #7e8fa8;
-            --text-muted: #3d4a5c;
-            --accent: #22d3ee;
-            --accent-soft: rgba(34, 211, 238, 0.08);
-            --accent-glow: rgba(34, 211, 238, 0.12);
-            --accent-2: #f472b6;
-            --success: #34d399;
-            --grid: rgba(255, 255, 255, 0.018);
-            --shadow: 0 1px 4px rgba(0,0,0,0.6), 0 8px 32px rgba(0,0,0,0.3);
-        }
-
-        [data-theme="light"] {
-            --bg: #f8fafc;
-            --bg-elevated: #eef2f7;
-            --bg-card: #ffffff;
-            --border: #dde3ed;
-            --border-strong: #c4cedb;
-            --text: #0d1117;
-            --text-dim: #4a5568;
-            --text-muted: #9faab8;
-            --accent: #0891b2;
-            --accent-soft: rgba(8, 145, 178, 0.08);
-            --accent-glow: rgba(8, 145, 178, 0.1);
-            --accent-2: #be185d;
-            --success: #059669;
-            --grid: rgba(0, 0, 0, 0.012);
-            --shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.07);
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: var(--font-sans);
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            transition: background var(--transition), color var(--transition);
-            background-image:
-                linear-gradient(var(--grid) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-            background-size: 48px 48px;
-        }
-        a { color: inherit; text-decoration: none; }
-        button { font-family: inherit; cursor: pointer; background: none; border: none; color: inherit; }
-        ::selection { background: var(--accent); color: #080a0f; }
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-
-        /* NAV */
-        .nav {
-            position: sticky; top: 0; z-index: 50;
-            background: color-mix(in srgb, var(--bg) 82%, transparent);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-        }
-        .nav-inner {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 15px 0; gap: 16px;
-        }
-        .brand {
-            display: flex; align-items: center; gap: 10px;
-            font-family: var(--font-mono); font-size: 14px; font-weight: 500;
-        }
-        .brand-dot {
-            width: 7px; height: 7px;
-            background: var(--accent); border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent);
-        }
-        .brand-handle { color: var(--text-dim); font-weight: 400; }
-
-        .nav-right {
-            display: flex; align-items: center; gap: 4px;
-            font-family: var(--font-mono); font-size: 13px;
-        }
-        .nav-link {
-            padding: 8px 12px; color: var(--text-dim);
-            border-radius: 6px; transition: all var(--transition);
-        }
-        .nav-link:hover { color: var(--text); background: var(--bg-elevated); }
-
-        .toggle-btn {
-            width: 36px; height: 36px;
-            display: grid; place-items: center;
-            border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text-dim); transition: all var(--transition);
-            font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-        }
-        .toggle-btn:hover { color: var(--accent); border-color: var(--accent); }
-        .toggle-btn svg { width: 16px; height: 16px; }
-        [data-theme="dark"] .icon-sun { display: block; }
-        [data-theme="dark"] .icon-moon { display: none; }
-        [data-theme="light"] .icon-sun { display: none; }
-        [data-theme="light"] .icon-moon { display: block; }
-
-        /* HERO */
-        .hero {
-            padding: 88px 0 64px;
-            position: relative; overflow: hidden;
-        }
-        .hero::before {
-            content: '';
-            position: absolute; top: -160px; right: -80px;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
-            pointer-events: none;
-        }
-        .hero > .container { position: relative; }
-
-        .hero-label {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 6px 14px;
-            border: 1px solid var(--border-strong); border-radius: 100px;
-            font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
-            margin-bottom: 32px;
-        }
-        .hero-label-dot {
-            width: 6px; height: 6px;
-            background: var(--success); border-radius: 50%;
-            box-shadow: 0 0 8px var(--success);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .hero-title {
-            font-family: var(--font-serif);
-            font-size: clamp(44px, 8vw, 84px);
-            font-weight: 400; line-height: 1.02; letter-spacing: -0.02em;
-            margin-bottom: 24px;
-        }
-        .hero-title em { font-style: italic; color: var(--accent); }
-        .hero-title .line-2 { display: block; padding-left: clamp(20px, 4vw, 60px); }
-
-        .hero-sub {
-            font-size: 18px; color: var(--text-dim);
-            max-width: 600px; margin-bottom: 36px; line-height: 1.6;
-            font-weight: 400;
-        }
-        .hero-cta {
-            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-        }
-
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 22px;
-            font-family: var(--font-mono); font-size: 13px; font-weight: 500;
-            border-radius: 8px; transition: all var(--transition);
-            border: 1px solid transparent;
-        }
-        .btn-primary {
-            background: var(--accent); color: #080a0f;
-            box-shadow: 0 0 24px -6px var(--accent-glow);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 32px -6px var(--accent);
-        }
-        .btn-secondary {
-            border-color: var(--border-strong); color: var(--text);
-        }
-        .btn-secondary:hover {
-            border-color: var(--accent); color: var(--accent);
-            background: var(--accent-soft);
-        }
-        .btn svg { width: 14px; height: 14px; }
-
-        .hero-stats {
-            margin-top: 72px; padding: 28px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
-        }
-        .stat-label {
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 0.1em; margin-bottom: 6px;
-        }
-        .stat-value {
-            font-family: var(--font-mono); font-size: 14px;
-            color: var(--text); font-weight: 500;
-        }
-        .stat-value-2 {
-            font-size: 12px; color: var(--text-dim); margin-top: 3px;
-        }
-
-        .distros-strip {
-            margin-top: 32px; margin-bottom: 48px;
-            padding: 18px 22px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-        }
-        .distros-label {
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 0.1em; flex-shrink: 0;
-        }
-        .distros-list { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
-        .distro-badge {
-            font-family: var(--font-mono); font-size: 12px;
-            padding: 5px 12px;
-            border: 1px solid var(--border-strong); border-radius: 100px;
-            color: var(--text); background: var(--bg-elevated);
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: all var(--transition);
-        }
-        .distro-badge:hover { border-color: var(--accent); color: var(--accent); }
-        .distro-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-        .dot-debian { background: #a80030; }
-        .dot-ubuntu { background: #e95420; }
-        .dot-rocky { background: #10b981; }
-        .dot-alma { background: #4080bf; }
-        .dot-fedora { background: #4a7bc4; }
-
-        /* SECTIONS */
-        .section { padding: 80px 0; }
-        .section-header {
-            display: flex; align-items: baseline; justify-content: space-between;
-            margin-bottom: 40px; gap: 24px; flex-wrap: wrap;
-        }
-        .section-title {
-            font-family: var(--font-serif); font-size: 40px;
-            font-weight: 400; letter-spacing: -0.01em;
-        }
-        .section-title em { color: var(--accent); font-style: italic; }
-        .section-sub {
-            font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
-        }
-
-        /* SERVICES */
-        .services {
-            background: var(--bg-elevated);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-        .services-intro {
-            max-width: 700px; margin-bottom: 48px;
-            font-size: 16px; color: var(--text-dim); line-height: 1.7;
-        }
-        .pricing-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 16px; margin-bottom: 32px;
-        }
-        .pricing-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px; padding: 28px;
-            display: flex; flex-direction: column; gap: 20px;
-            transition: all 0.25s ease;
-            position: relative;
-        }
-        .pricing-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--border-strong);
-            box-shadow: var(--shadow);
-        }
-        .pricing-card.featured {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 1px var(--accent-soft), 0 8px 32px -8px var(--accent-soft);
-        }
-        .pricing-card.featured::before {
-            content: attr(data-featured);
-            position: absolute; top: -11px; left: 20px;
-            background: var(--accent); color: #080a0f;
-            font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-            padding: 3px 10px; border-radius: 100px;
-            letter-spacing: 0.1em; text-transform: uppercase;
-        }
-        .tier-name {
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em;
-        }
-        .tier-price {
-            font-family: var(--font-serif); font-size: 48px;
-            font-weight: 400; line-height: 1; letter-spacing: -0.02em;
-        }
-        .tier-price .currency { font-size: 22px; color: var(--text-dim); vertical-align: super; }
-        .tier-desc {
-            color: var(--text-dim); font-size: 14px; line-height: 1.6;
-            padding-bottom: 18px; border-bottom: 1px solid var(--border);
-        }
-        .tier-features {
-            list-style: none; display: flex; flex-direction: column; gap: 10px; flex: 1;
-        }
-        .tier-features li {
-            font-size: 13px; color: var(--text);
-            display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
-        }
-        .tier-features li::before { content: '✓'; color: var(--success); font-weight: bold; flex-shrink: 0; }
-        .tier-features li.muted { color: var(--text-muted); }
-        .tier-features li.muted::before { content: '—'; color: var(--text-muted); }
-        .services-cta { text-align: center; padding-top: 24px; }
-
-        /* LABS */
-        .labs-filters {
-            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;
-        }
-        .filter-chip {
-            font-family: var(--font-mono); font-size: 12px;
-            padding: 7px 14px;
-            border: 1px solid var(--border-strong); border-radius: 100px;
-            color: var(--text-dim); transition: all var(--transition);
-        }
-        .filter-chip:hover { border-color: var(--accent); color: var(--accent); }
-        .filter-chip.active {
-            background: var(--accent); border-color: var(--accent); color: #080a0f;
-            font-weight: 600;
-        }
-
-        .labs-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-        }
-        .lab-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px; padding: 24px;
-            transition: all 0.25s ease;
-            display: flex; flex-direction: column; gap: 14px;
-            position: relative; overflow: hidden;
-        }
-        .lab-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .lab-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--border-strong);
-            box-shadow: var(--shadow);
-        }
-        .lab-card:hover::before { opacity: 1; }
-
-        .lab-header {
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-        }
-        .lab-id {
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
-        }
-        .lab-type {
-            font-family: var(--font-mono); font-size: 10px;
-            padding: 3px 9px; border-radius: 100px;
-            letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
-        }
-        .lab-type-lab { background: var(--accent-soft); color: var(--accent); }
-        .lab-type-repos { background: rgba(52,211,153,0.1); color: #34d399; }
-        .lab-type-notes { background: rgba(244,114,182,0.08); color: #f472b6; }
-        .lab-type-guide { background: rgba(96,165,250,0.1); color: #60a5fa; }
-        [data-theme="light"] .lab-type-repos { background: rgba(5,150,105,0.08); color: #059669; }
-        [data-theme="light"] .lab-type-notes { background: rgba(190,24,93,0.08); color: #be185d; }
-        [data-theme="light"] .lab-type-guide { background: rgba(29,78,216,0.08); color: #1d4ed8; }
-
-        .lab-title {
-            font-family: var(--font-serif); font-size: 22px;
-            font-weight: 400; letter-spacing: -0.01em; line-height: 1.2;
-        }
-        .lab-desc {
-            color: var(--text-dim); font-size: 14px; line-height: 1.6; flex: 1;
-        }
-        .lab-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .lab-tag {
-            font-family: var(--font-mono); font-size: 10px;
-            padding: 3px 8px;
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            border-radius: 4px; color: var(--text-muted);
-        }
-        .lab-footer {
-            display: flex; align-items: center; justify-content: space-between;
-            padding-top: 14px; border-top: 1px solid var(--border);
-        }
-        .lab-link {
-            font-family: var(--font-mono); font-size: 12px;
-            color: var(--accent); font-weight: 500;
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: gap var(--transition);
-        }
-        .lab-link:hover { gap: 10px; }
-        .lab-card.hidden { display: none; }
-
-        /* ABOUT */
-        .about-grid {
-            display: grid; grid-template-columns: 1.2fr 0.8fr;
-            gap: 48px; align-items: start;
-        }
-        .about-text p {
-            font-size: 16px; color: var(--text-dim);
-            margin-bottom: 16px; line-height: 1.75;
-        }
-        .about-text p:first-child { font-size: 18px; color: var(--text); }
-        .about-quote {
-            border-left: 2px solid var(--accent);
-            padding-left: 20px; margin-top: 24px;
-            font-family: var(--font-serif); font-size: 20px;
-            font-style: italic; color: var(--text); line-height: 1.45;
-        }
-        .about-sidebar {
-            position: sticky; top: 100px;
-            padding: 24px;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-        .about-side-title {
-            font-family: var(--font-mono); font-size: 11px;
-            color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 0.1em; margin-bottom: 16px;
-        }
-        .about-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-        .about-list li {
-            font-family: var(--font-mono); font-size: 13px; color: var(--text);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .about-list li::before { content: '▸'; color: var(--accent); }
-
-        /* FOOTER */
-        .footer {
-            padding: 40px 0 28px;
-            border-top: 1px solid var(--border);
-        }
-        .footer-inner {
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 20px;
-        }
-        .footer-brand {
-            font-family: var(--font-serif); font-size: 22px; font-style: italic;
-        }
-        .footer-meta {
-            font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
-        }
-        .footer-social { display: flex; gap: 10px; }
-        .social-link {
-            width: 34px; height: 34px;
-            border: 1px solid var(--border); border-radius: 8px;
-            display: grid; place-items: center;
-            color: var(--text-dim); transition: all var(--transition);
-        }
-        .social-link:hover {
-            color: var(--accent); border-color: var(--accent);
-            transform: translateY(-2px);
-        }
-        .social-link svg { width: 16px; height: 16px; }
-
-        /* RESPONSIVE */
-        @media (max-width: 880px) {
-            .pricing-grid { grid-template-columns: 1fr; }
-            .pricing-card.featured { order: -1; }
-        }
-        @media (max-width: 768px) {
-            .container { padding: 0 20px; }
-            .hero { padding: 56px 0 40px; }
-            .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .section { padding: 56px 0; }
-            .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .about-grid { grid-template-columns: 1fr; gap: 32px; }
-            .about-sidebar { position: static; }
-            .labs-grid { grid-template-columns: 1fr; }
-            .hero-title .line-2 { padding-left: 0; }
-            .section-title { font-size: 32px; }
-        }
-        @media (max-width: 520px) {
-            .nav-link { display: none; }
-            .brand-handle { display: none; }
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .hero > .container > * { animation: fadeUp 0.55s ease-out backwards; }
-        .hero-label { animation-delay: 0.05s; }
-        .hero-title { animation-delay: 0.12s; }
-        .hero-sub { animation-delay: 0.2s; }
-        .hero-cta { animation-delay: 0.27s; }
-        .hero-stats { animation-delay: 0.34s; }
-
-        [data-i18n] { transition: opacity 0.12s; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/site.css">
+    <link rel="stylesheet" href="assets/home.css">
 </head>
 <body>
 
-    <nav class="nav">
-        <div class="container nav-inner">
-            <a href="#" class="brand">
-                <span class="brand-dot"></span>
-                <span>Jaren Bailon</span>
-                <span class="brand-handle">· @AngheloBR</span>
-            </a>
-            <div class="nav-right">
-                <a href="#services" class="nav-link" data-i18n="nav.services">Services</a>
-                <a href="#labs" class="nav-link" data-i18n="nav.labs">Labs</a>
-                <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
-                <button class="toggle-btn" onclick="toggleLang()" aria-label="Toggle language" title="Change language">
-                    <span id="langText">EN</span>
-                </button>
-                <button class="toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Change theme">
-                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </button>
-            </div>
+<nav class="nav">
+    <div class="container nav-inner">
+        <a href="#" class="brand" aria-label="Jaren Bailon, home">
+            <span class="brand-dot" aria-hidden="true"></span>
+            <span>Jaren Bailon</span>
+            <span class="brand-handle">@AngheloBR</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="#changes" class="nav-link" data-i18n="nav.changes">What changes</a>
+            <a href="#process" class="nav-link" data-i18n="nav.process">Process</a>
+            <a href="#pricing" class="nav-link" data-i18n="nav.pricing">Pricing</a>
+            <a href="#labs" class="nav-link" data-i18n="nav.labs">Labs</a>
+            <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
         </div>
-    </nav>
+        <div class="nav-right">
+            <button class="icon-btn" type="button" onclick="toggleLang()" aria-label="Switch language" title="EN / ES"><span id="langText">ES</span></button>
+            <button class="icon-btn" type="button" onclick="toggleTheme()" aria-label="Switch theme" title="Theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+            </button>
+        </div>
+    </div>
+</nav>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-label">
-                <span class="hero-label-dot"></span>
-                <span data-i18n="hero.label">Available for freelance · Based in Peru</span>
-            </div>
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-in">
+            <div class="hero-label"><i aria-hidden="true"></i><span data-i18n="hero.label">Available for freelance · Peru · GMT-5</span></div>
             <h1 class="hero-title">
-                <span data-i18n="hero.title1">Linux server security</span>
-                <span class="line-2" data-i18n-html="hero.title2">&amp; <em>hardening</em>, documented.</span>
+                <span data-i18n="hero.h1">Your new VPS is wide open.</span>
+                <span class="line-2" data-i18n="hero.h2">I close it, and hand you the paper trail.</span>
             </h1>
-            <p class="hero-sub" data-i18n="hero.sub">
-                I'm Jaren — a Networks &amp; Cybersecurity student who breaks things in labs so you don't have to break them in production. I harden Linux VPS for developers, small teams &amp; agencies.
-            </p>
+            <p class="hero-sub" data-i18n-html="hero.sub">SSH keys only, root locked out, firewall up, Fail2Ban watching, security updates on autopilot. <strong>Every change goes into a PDF</strong> you can audit, reverse, or redo in two years.</p>
             <div class="hero-cta">
-                <a href="#services" class="btn btn-primary">
+                <a href="https://fiverr.com/jaren_anghelo" class="btn btn-primary" target="_blank" rel="noopener">
                     <span data-i18n="hero.cta1">Hire me on Fiverr</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </a>
-                <a href="#labs" class="btn btn-secondary" data-i18n="hero.cta2">Browse labs</a>
+                <a href="#changes" class="btn btn-secondary" data-i18n="hero.cta2">See what changes</a>
+            </div>
+            <div class="hero-distros">
+                <span class="d-debian">Debian 11–13</span>
+                <span class="d-ubuntu">Ubuntu 20.04–24.04</span>
+                <span class="d-rocky">Rocky</span>
+                <span class="d-alma">Alma</span>
+                <span class="d-fedora">Fedora</span>
+            </div>
+        </div>
+
+        <section class="scene" id="scene" data-state="stock" aria-label="Interactive demo: a stock server gets broken into until you harden it">
+            <div class="scene-corner tl"><i aria-hidden="true"></i><b>srv-debian</b><span class="t-stock" data-i18n="scene.stock.label">· stock config</span><span class="t-hardened" data-i18n="scene.hardened.label">· hardened</span></div>
+            <div class="scene-switch" role="group" aria-label="Server state">
+                <button type="button" data-set="stock" data-i18n="scene.sw.stock">stock</button>
+                <button type="button" data-set="hardened" data-i18n="scene.sw.hardened">hardened</button>
+            </div>
+            <button type="button" class="scene-cta" id="hardenBtn">
+                <span data-i18n="scene.harden">Harden this server</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <div class="hud" aria-hidden="true">
+                <div class="hud-head">
+                    <span><span class="t-stock" data-i18n="hud.title.stock">What a stock server sees</span><span class="t-hardened" data-i18n="hud.title">What a hardened server sees</span></span>
+                    <em id="hudCount"></em>
+                </div>
+                <div class="hud-lines" id="hudLines"></div>
+            </div>
+        </section>
+    </div>
+</section>
+
+<!-- ============ CHANGES ============ -->
+<section class="section" id="changes">
+    <div class="container">
+        <div class="section-head reveal">
+            <div>
+                <div class="eyebrow">diff --stock --hardened</div>
+                <h2 class="section-title" data-i18n="changes.title">What actually changes on your server</h2>
+            </div>
+            <p class="section-lede" data-i18n="changes.lede">No black box. This is the delta between a stock VPS and the one I hand back. Each line maps to a page in the report.</p>
+        </div>
+
+        <div class="changes-grid">
+            <div class="changes-left">
+            <div class="diff reveal" id="diff">
+                <div class="diff-head">
+                    <span><b>server.conf</b> · <span data-i18n="diff.head">stock → hardened</span></span>
+                    <span class="stat"><span class="del">−6</span><span class="add">+8</span></span>
+                </div>
+                <div class="diff-body">
+                    <div class="diff-line ctx"><span class="ln">1</span><span class="sym"> </span><span class="c"># access</span></div>
+                    <div class="diff-line del"><span class="ln">2</span><span class="sym">−</span><span>PermitRootLogin yes</span></div>
+                    <div class="diff-line add"><span class="ln">2</span><span class="sym">+</span><span>PermitRootLogin no</span></div>
+                    <div class="diff-line del"><span class="ln">3</span><span class="sym">−</span><span>PasswordAuthentication yes</span></div>
+                    <div class="diff-line add"><span class="ln">3</span><span class="sym">+</span><span>PasswordAuthentication no</span></div>
+                    <div class="diff-line add"><span class="ln">4</span><span class="sym">+</span><span>AllowUsers deploy <span class="c"># sudo, ed25519 key</span></span></div>
+                    <div class="diff-line ctx"><span class="ln">5</span><span class="sym"> </span><span class="c"># network</span></div>
+                    <div class="diff-line del"><span class="ln">6</span><span class="sym">−</span><span>ufw: inactive</span></div>
+                    <div class="diff-line add"><span class="ln">6</span><span class="sym">+</span><span>ufw: active · default deny incoming · allow 22, 80, 443</span></div>
+                    <div class="diff-line del"><span class="ln">7</span><span class="sym">−</span><span>fail2ban: not installed</span></div>
+                    <div class="diff-line add"><span class="ln">7</span><span class="sym">+</span><span>fail2ban: sshd jail · 5 retries → 1h ban</span></div>
+                    <div class="diff-line ctx"><span class="ln">8</span><span class="sym"> </span><span class="c"># maintenance</span></div>
+                    <div class="diff-line del"><span class="ln">9</span><span class="sym">−</span><span>unattended-upgrades: not configured</span></div>
+                    <div class="diff-line add"><span class="ln">9</span><span class="sym">+</span><span>unattended-upgrades: security updates, daily</span></div>
+                    <div class="diff-line del"><span class="ln">10</span><span class="sym">−</span><span>docker: not installed</span></div>
+                    <div class="diff-line add"><span class="ln">10</span><span class="sym">+</span><span>docker + compose: installed · DOCKER-USER chain wired to ufw <span class="c"># Standard+</span></span></div>
+                    <div class="diff-line add"><span class="ln">11</span><span class="sym">+</span><span>report.pdf: every change, with rollback notes</span></div>
+                </div>
             </div>
 
-            <div class="hero-stats">
-                <div>
-                    <div class="stat-label" data-i18n="stats.focus">Focus</div>
-                    <div class="stat-value" data-i18n="stats.focus.val">Linux-first</div>
+            <div class="callout reveal">
+                <b data-i18n="callout.t">Heads-up: Docker bypasses UFW.</b>
+                <span data-i18n="callout.p">Docker writes its own iptables rules, so a container's published port is reachable from the internet even while ufw says "deny". Standard and up wire the DOCKER-USER chain so the firewall stays in charge.</span>
+            </div>
+            </div>
+
+            <div class="why reveal">
+                <div class="why-item">
+                    <h3><span data-i18n="why.1.t">Access</span> <code>sshd_config</code></h3>
+                    <p data-i18n="why.1.p">Passwords get brute-forced all day, every day. Keys don't. Root goes away and a named sudo user takes its place, so every action has an owner.</p>
                 </div>
-                <div>
-                    <div class="stat-label" data-i18n="stats.supports">I support</div>
-                    <div class="stat-value">Debian · Ubuntu</div>
-                    <div class="stat-value stat-value-2">Rocky · Alma · Fedora</div>
+                <div class="why-item">
+                    <h3><span data-i18n="why.2.t">Network</span> <code>ufw · fail2ban</code></h3>
+                    <p data-i18n="why.2.p">Default deny means any new service you install is closed until you decide to open it. Fail2Ban bans the hosts that keep knocking.</p>
                 </div>
-                <div>
-                    <div class="stat-label" data-i18n="stats.stack">Stack</div>
-                    <div class="stat-value">SSH · UFW · firewalld</div>
-                    <div class="stat-value stat-value-2">Fail2Ban · Bash</div>
+                <div class="why-item">
+                    <h3><span data-i18n="why.3.t">Maintenance</span> <code>unattended-upgrades</code></h3>
+                    <p data-i18n="why.3.p">Security patches land on their own. You don't have to SSH in at 2 a.m. because a CVE dropped.</p>
                 </div>
-                <div>
-                    <div class="stat-label" data-i18n="stats.certs">Certs</div>
-                    <div class="stat-value">5× Cisco NetAcad</div>
+                <div class="why-item">
+                    <h3><span data-i18n="why.4.t">Paper trail</span> <code>report.pdf</code></h3>
+                    <p data-i18n="why.4.p">Every command, why it ran, and how to undo it. If you ever need to move to another provider, you can redo the whole thing yourself.</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="section services" id="services">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title" data-i18n-html="services.title">What I <em>offer</em></h2>
-                <span class="section-sub">// services</span>
+<!-- ============ PROCESS ============ -->
+<section class="section" id="process">
+    <div class="container">
+        <div class="section-head reveal">
+            <div>
+                <div class="eyebrow" data-i18n="process.eyebrow">how a job runs</div>
+                <h2 class="section-title" data-i18n="process.title">Three steps, no surprises</h2>
             </div>
-
-            <p class="services-intro" data-i18n="services.intro">
-                You just rented a VPS. By default it's wide open — weak SSH, no firewall, root exposed. I lock it down following security best practices, document every change, and hand it back ready for you to deploy.
-            </p>
-
-            <div class="distros-strip">
-                <span class="distros-label" data-i18n="distros.label">Supported distros</span>
-                <div class="distros-list">
-                    <span class="distro-badge"><span class="distro-dot dot-debian"></span>Debian 11/12/13</span>
-                    <span class="distro-badge"><span class="distro-dot dot-ubuntu"></span>Ubuntu 20.04 → 24.04</span>
-                    <span class="distro-badge"><span class="distro-dot dot-rocky"></span>Rocky Linux</span>
-                    <span class="distro-badge"><span class="distro-dot dot-alma"></span>AlmaLinux</span>
-                    <span class="distro-badge"><span class="distro-dot dot-fedora"></span>Fedora</span>
-                </div>
+            <p class="section-lede" data-i18n="process.lede">You share access once. Nothing gets applied without a second session open, so nobody gets locked out — including you.</p>
+        </div>
+        <div class="steps">
+            <div class="step reveal">
+                <div class="step-num">1</div>
+                <div class="step-meta">~30 min</div>
+                <h3 data-i18n="step.1.t">Audit</h3>
+                <p data-i18n="step.1.p">I read the server before touching it: users, open ports, running services, current SSH config. You get a short baseline of what's exposed.</p>
             </div>
-
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <div class="tier-name" data-i18n="tier.basic.name">Basic</div>
-                    <div class="tier-price"><span class="currency">$</span>35</div>
-                    <p class="tier-desc" data-i18n="tier.basic.desc">Essential hardening for a freshly provisioned VPS.</p>
-                    <ul class="tier-features">
-                        <li data-i18n="feat.user">Admin user with SSH key</li>
-                        <li data-i18n="feat.root">Root login disabled</li>
-                        <li data-i18n="feat.fw">Firewall (UFW / firewalld)</li>
-                        <li data-i18n="feat.f2b">Fail2Ban setup</li>
-                        <li data-i18n="feat.updates">Automatic security updates</li>
-                        <li class="muted" data-i18n="feat.docker.basic">No Docker setup</li>
-                        <li class="muted" data-i18n="feat.report.basic">No PDF report</li>
-                    </ul>
-                </div>
-
-                <div class="pricing-card featured" data-featured="Most popular">
-                    <div class="tier-name" data-i18n="tier.std.name">Standard</div>
-                    <div class="tier-price"><span class="currency">$</span>70</div>
-                    <p class="tier-desc" data-i18n="tier.std.desc">Full hardening + Docker ready + documentation.</p>
-                    <ul class="tier-features">
-                        <li data-i18n="feat.user">Admin user with SSH key</li>
-                        <li data-i18n="feat.root">Root login disabled</li>
-                        <li data-i18n="feat.fw">Firewall (UFW / firewalld)</li>
-                        <li data-i18n="feat.f2b">Fail2Ban setup</li>
-                        <li data-i18n="feat.updates">Automatic security updates</li>
-                        <li data-i18n="feat.docker">Docker + Compose installed</li>
-                        <li data-i18n="feat.report">PDF report of all changes</li>
-                    </ul>
-                </div>
-
-                <div class="pricing-card">
-                    <div class="tier-name" data-i18n="tier.prem.name">Premium</div>
-                    <div class="tier-price"><span class="currency">$</span>120</div>
-                    <p class="tier-desc" data-i18n="tier.prem.desc">Standard + custom SSH port, audit &amp; priority support.</p>
-                    <ul class="tier-features">
-                        <li data-i18n="feat.std">Everything in Standard</li>
-                        <li data-i18n="feat.port">Custom SSH port</li>
-                        <li data-i18n="feat.audit">Lynis security audit report</li>
-                        <li data-i18n="feat.priority">Priority response (~24h)</li>
-                        <li data-i18n="feat.warranty">14-day post-delivery support</li>
-                    </ul>
-                </div>
+            <div class="step reveal">
+                <div class="step-num">2</div>
+                <div class="step-meta" data-i18n="step.2.m">1–4 h, by tier</div>
+                <h3 data-i18n="step.2.t">Harden</h3>
+                <p data-i18n="step.2.p">Apply the changes above, one at a time, testing each from a second connection. Custom port, Docker, TLS and the Lynis audit depend on the tier.</p>
             </div>
-
-            <div class="services-cta">
-                <a href="https://fiverr.com/jaren_anghelo" class="btn btn-primary" target="_blank" rel="noopener">
-                    <span data-i18n="services.cta">View gig on Fiverr</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                </a>
+            <div class="step reveal">
+                <div class="step-num">3</div>
+                <div class="step-meta" data-i18n="step.3.m">with delivery · 1–3 days</div>
+                <h3 data-i18n="step.3.t">Report</h3>
+                <p data-i18n="step.3.p">A PDF with every command, why it ran, and how to reverse it (Basic gets a text summary). Premium includes 14 days of support if anything behaves oddly after.</p>
             </div>
         </div>
-    </section>
-
-    <section class="section" id="labs">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title" data-i18n-html="labs.title">Labs &amp; <em>notes</em></h2>
-                <span class="section-sub">// public docs</span>
+        <div class="access reveal">
+            <div class="access-head">
+                <div class="eyebrow" data-i18n="access.eyebrow">access, in and out</div>
+                <h3 data-i18n="access.title">You never hand me a password</h3>
             </div>
+            <ul class="access-list">
+                <li data-i18n-html="access.1"><strong>In.</strong> You add my public key to a sudo user. I never ask for the root password.</li>
+                <li data-i18n-html="access.2"><strong>During.</strong> Every change is applied with a second session open, so nobody gets locked out.</li>
+                <li data-i18n-html="access.3"><strong>Out.</strong> On delivery I remove my key, and the report says so. What you keep is yours.</li>
+            </ul>
+        </div>
+    </div>
+</section>
 
-            <div class="labs-filters">
-                <button class="filter-chip active" data-filter="all" data-i18n="filter.all">All</button>
-                <button class="filter-chip" data-filter="debian">Debian</button>
-                <button class="filter-chip" data-filter="arch">Arch</button>
-                <button class="filter-chip" data-filter="lab" data-i18n="filter.lab">Labs</button>
-                <button class="filter-chip" data-filter="security" data-i18n="filter.sec">Security</button>
-                <button class="filter-chip" data-filter="python" data-i18n="filter.python">Python</button>
+<!-- ============ PRICING ============ -->
+<section class="section" id="pricing">
+    <div class="container">
+        <div class="section-head reveal">
+            <div>
+                <div class="eyebrow" data-i18n="pricing.eyebrow">fixed price · one server</div>
+                <h2 class="section-title" data-i18n="pricing.title">Pricing</h2>
             </div>
-
-            <div class="labs-grid">
-                <a href="lab-003-hardening.html" class="lab-card" data-tags="debian lab security hardening">
-                    <div class="lab-header">
-                        <span class="lab-id">LAB 003</span>
-                        <span class="lab-type lab-type-lab" data-i18n="type.lab">Lab</span>
-                    </div>
-                    <h3 class="lab-title" data-i18n="lab003.title">Hardening Debian</h3>
-                    <p class="lab-desc" data-i18n="lab003.desc">Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">debian</span>
-                        <span class="lab-tag">security</span>
-                        <span class="lab-tag">hardening</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
-
-                <a href="lab-002-vpn.html" class="lab-card" data-tags="debian lab vpn wireguard">
-                    <div class="lab-header">
-                        <span class="lab-id">LAB 002</span>
-                        <span class="lab-type lab-type-lab" data-i18n="type.lab">Lab</span>
-                    </div>
-                    <h3 class="lab-title" data-i18n="lab002.title">VPN PC → VPS</h3>
-                    <p class="lab-desc" data-i18n="lab002.desc">Simple VPN setup from your PC to a public-IP VPS using WireGuard — no router dependency.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">debian</span>
-                        <span class="lab-tag">wireguard</span>
-                        <span class="lab-tag">vpn</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
-
-                <a href="lab-001-dns.html" class="lab-card" data-tags="debian lab dns networking">
-                    <div class="lab-header">
-                        <span class="lab-id">LAB 001</span>
-                        <span class="lab-type lab-type-lab" data-i18n="type.lab">Lab</span>
-                    </div>
-                    <h3 class="lab-title" data-i18n="lab001.title">Fix DNS Debian</h3>
-                    <p class="lab-desc" data-i18n="lab001.desc">Resolving the 'Temporary failure in name resolution' error by creating /etc/resolv.conf with safe public DNS servers.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">debian</span>
-                        <span class="lab-tag">dns</span>
-                        <span class="lab-tag">networking</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
-
-                <a href="lab-004-nas.html" class="lab-card" data-tags="debian lab nas storage">
-                    <div class="lab-header">
-                        <span class="lab-id">LAB 004</span>
-                        <span class="lab-type lab-type-lab" data-i18n="type.lab">Lab</span>
-                    </div>
-                    <h3 class="lab-title" data-i18n="lab004.title">Home NAS</h3>
-                    <p class="lab-desc" data-i18n="lab004.desc">Simple NAS build with Debian + Samba to share files across your local network and homelab.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">debian</span>
-                        <span class="lab-tag">nas</span>
-                        <span class="lab-tag">storage</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
-
-                <a href="debian-13-sources.html" class="lab-card" data-tags="debian repos apt">
-                    <div class="lab-header">
-                        <span class="lab-id">REPOS</span>
-                        <span class="lab-type lab-type-repos" data-i18n="type.config">Config</span>
-                    </div>
-                    <h3 class="lab-title">Debian 13 · sources.list</h3>
-                    <p class="lab-desc" data-i18n="labsrc.desc">Recommended /etc/apt/sources.list configuration for Debian 13 (Trixie) — main, contrib, non-free, firmware &amp; backports.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">debian</span>
-                        <span class="lab-tag">apt</span>
-                        <span class="lab-tag">trixie</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
-
-                <a href="arch-configs.html" class="lab-card" data-tags="arch cachyos linux desktop">
-                    <div class="lab-header">
-                        <span class="lab-id">NOTES</span>
-                        <span class="lab-type lab-type-notes" data-i18n="type.notes">Notes</span>
-                    </div>
-                    <h3 class="lab-title" data-i18n="labarch.title">Arch / CachyOS base configs</h3>
-                    <p class="lab-desc" data-i18n="labarch.desc">Space to document my CachyOS / Arch base configuration: dotfiles, terminal, zsh, powerlevel10k and more.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">arch</span>
-                        <span class="lab-tag">cachyos</span>
-                        <span class="lab-tag">desktop</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
-
-                <a href="python-intro.html" class="lab-card" data-tags="python beginner guide programming">
-                    <div class="lab-header">
-                        <span class="lab-id">GUIDE</span>
-                        <span class="lab-type lab-type-guide" data-i18n="type.guide">Guide</span>
-                    </div>
-                    <h3 class="lab-title" data-i18n="labpy.title">Python para Principiantes</h3>
-                    <p class="lab-desc" data-i18n="labpy.desc">Guía práctica de Python desde cero: variables, condicionales, bucles, funciones y ejercicios resueltos para estudiantes sin experiencia previa.</p>
-                    <div class="lab-tags">
-                        <span class="lab-tag">python</span>
-                        <span class="lab-tag">beginner</span>
-                        <span class="lab-tag">programming</span>
-                    </div>
-                    <div class="lab-footer">
-                        <span class="lab-link" data-i18n="lab.read">Read details →</span>
-                    </div>
-                </a>
+            <p class="section-lede" data-i18n="pricing.lede">Ordered and paid through Fiverr, so you're covered by their escrow. Multiple servers? Message me first.</p>
+        </div>
+        <div class="tiers">
+            <div class="tier reveal">
+                <div class="tier-name">Basic <span class="tier-alias" data-i18n="tier.basic.alias">· Lockdown</span></div>
+                <div class="tier-price"><small>$</small>30</div>
+                <div class="tier-meta"><span data-i18n="tier.basic.time">~1.5 h of work</span> · <span data-i18n="tier.basic.eta">1-day delivery</span></div>
+                <p class="tier-desc" data-i18n="tier.basic">You just bought a VPS and want it closed today.</p>
+                <ul class="tier-features">
+                    <li data-i18n="feat.user">Sudo user with SSH key</li>
+                    <li data-i18n="feat.root">Root and password login disabled</li>
+                    <li data-i18n="feat.fw">UFW default deny (22, 80, 443 or your ports)</li>
+                    <li data-i18n="feat.f2b">Fail2Ban on SSH</li>
+                    <li data-i18n="feat.updates">Automatic security updates</li>
+                    <li data-i18n="feat.summary">Text summary of every change</li>
+                    <li class="off" data-i18n="feat.docker">Docker + Compose, firewall-aware</li>
+                    <li class="off" data-i18n="feat.report">PDF report with rollback notes</li>
+                </ul>
+                <a href="https://fiverr.com/jaren_anghelo" class="btn btn-secondary" target="_blank" rel="noopener" data-i18n="tier.cta">Order on Fiverr</a>
+            </div>
+            <div class="tier featured reveal">
+                <div class="tier-flag" data-i18n="tier.flag">Most picked</div>
+                <div class="tier-name">Standard <span class="tier-alias" data-i18n="tier.std.alias">· Deploy-ready</span></div>
+                <div class="tier-price"><small>$</small>75</div>
+                <div class="tier-meta"><span data-i18n="tier.std.time">~3 h of work</span> · <span data-i18n="tier.std.eta">2-day delivery</span></div>
+                <p class="tier-desc" data-i18n="tier.std">You're about to deploy Docker, n8n or Coolify and want the box ready.</p>
+                <ul class="tier-features">
+                    <li data-i18n="feat.basic">Everything in Basic</li>
+                    <li data-i18n="feat.port">Custom SSH port (optional)</li>
+                    <li data-i18n="feat.docker">Docker + Compose, firewall-aware</li>
+                    <li data-i18n="feat.sysctl">sysctl hardening: SYN cookies, anti-spoofing, no ICMP redirects</li>
+                    <li data-i18n="feat.base">Timezone, NTP, swap</li>
+                    <li data-i18n="feat.report">PDF report with rollback notes</li>
+                </ul>
+                <a href="https://fiverr.com/jaren_anghelo" class="btn btn-primary" target="_blank" rel="noopener" data-i18n="tier.cta">Order on Fiverr</a>
+            </div>
+            <div class="tier reveal">
+                <div class="tier-name">Premium <span class="tier-alias" data-i18n="tier.prem.alias">· Audited</span></div>
+                <div class="tier-price"><small>$</small>150</div>
+                <div class="tier-meta"><span data-i18n="tier.prem.time">~5 h of work</span> · <span data-i18n="tier.prem.eta">3-day delivery</span></div>
+                <p class="tier-desc" data-i18n="tier.prem">A small business that needs proof it was done right.</p>
+                <ul class="tier-features">
+                    <li data-i18n="feat.std">Everything in Standard</li>
+                    <li data-i18n="feat.audit">Lynis audit before and after, with score</li>
+                    <li data-i18n="feat.ids">rkhunter + auditd</li>
+                    <li data-i18n="feat.logwatch">Daily logwatch summary by email</li>
+                    <li data-i18n="feat.tls">Nginx/Caddy reverse proxy with TLS (Let's Encrypt)</li>
+                    <li data-i18n="feat.2fa">SSH 2FA (TOTP), optional</li>
+                    <li data-i18n="feat.warranty">14-day post-delivery support</li>
+                </ul>
+                <a href="https://fiverr.com/jaren_anghelo" class="btn btn-secondary" target="_blank" rel="noopener" data-i18n="tier.cta">Order on Fiverr</a>
             </div>
         </div>
-    </section>
 
-    <section class="section" id="about">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title" data-i18n-html="about.title">About <em>me</em></h2>
-                <span class="section-sub">// whoami</span>
+        <div class="extras reveal">
+            <div class="extras-title" data-i18n="extras.title">Extras</div>
+            <ul class="extras-list">
+                <li><b>+$25</b><span data-i18n="extra.server">Additional server</span></li>
+                <li><b>+$15</b><span data-i18n="extra.express">24-hour express delivery</span></li>
+                <li><b>+$20</b><span data-i18n="extra.lynis">Lynis audit on its own</span></li>
+                <li class="hot"><b>$30<small data-i18n="extra.mo">/mo</small></b><span data-i18n="extra.maint">Monthly maintenance: updates, log review, re-audit</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ============ LABS ============ -->
+<section class="section" id="labs">
+    <div class="container">
+        <div class="section-head reveal">
+            <div>
+                <div class="eyebrow" data-i18n="labs.eyebrow">public notebook</div>
+                <h2 class="section-title" data-i18n="labs.title">Labs &amp; notes</h2>
             </div>
+            <p class="section-lede" data-i18n="labs.lede">Everything I apply on a client's box, I first break in my homelab and write up here. Written in Spanish, hands-on, copy-pasteable.</p>
+        </div>
 
-            <div class="about-grid">
-                <div class="about-text">
-                    <p data-i18n="about.p1">I'm Jaren Bailon, a Networks &amp; Cybersecurity graduate from SENATI (Peru). I run my own Linux homelab, break things on purpose, and write it down so the next person doesn't have to.</p>
-                    <p data-i18n="about.p2">My focus is Linux server security: SSH hardening, firewall configuration, automated updates, intrusion prevention. Not flashy work — boring, reliable, documented.</p>
-                    <p data-i18n="about.p3">I keep this site as a public log of what I learn. If you need someone to harden your VPS without overselling, you're in the right place.</p>
-                    <div class="about-quote" data-i18n="about.quote">"The best security setup is the one you can explain, reverse, and re-apply in two years."</div>
-                </div>
+        <div class="filters reveal" role="group" aria-label="Filter labs">
+            <button class="chip active" type="button" data-filter="all" data-i18n="filter.all">All</button>
+            <button class="chip" type="button" data-filter="lab" data-i18n="filter.lab">Labs</button>
+            <button class="chip" type="button" data-filter="security" data-i18n="filter.sec">Security</button>
+            <button class="chip" type="button" data-filter="debian">Debian</button>
+            <button class="chip" type="button" data-filter="arch">Arch</button>
+            <button class="chip" type="button" data-filter="python">Python</button>
+        </div>
 
-                <aside class="about-sidebar">
-                    <div class="about-side-title" data-i18n="about.side">Quick facts</div>
-                    <ul class="about-list">
-                        <li data-i18n="fact.peru">Peru 🇵🇪 · GMT-5</li>
-                        <li data-i18n="fact.grad">SENATI graduate (2025)</li>
-                        <li data-i18n="fact.field">Networks &amp; Cybersecurity</li>
-                        <li data-i18n="fact.certs">5× Cisco NetAcad certs</li>
-                        <li data-i18n="fact.os">CachyOS / bspwm daily driver</li>
-                        <li data-i18n="fact.open">Open to freelance work</li>
-                    </ul>
-                </aside>
+        <div class="labs-grid" id="labsGrid">
+            <a href="lab-003-hardening.html" class="lab-card flagship reveal" data-tags="debian lab security hardening">
+                <div class="lab-top"><span class="lab-file">lab-003-hardening.html</span><span class="lab-type t-lab">Lab 003</span></div>
+                <h3 class="lab-title" data-i18n="lab003.t">Hardening Debian</h3>
+                <p class="lab-desc" data-i18n="lab003.d">Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates. The same list I run on client servers.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>security</span><span>hardening</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+            <a href="lab-002-vpn.html" class="lab-card reveal" data-tags="debian lab security vpn wireguard">
+                <div class="lab-top"><span class="lab-file">lab-002-vpn.html</span><span class="lab-type t-lab">Lab 002</span></div>
+                <h3 class="lab-title" data-i18n="lab002.t">VPN PC → VPS with WireGuard</h3>
+                <p class="lab-desc" data-i18n="lab002.d">A direct WireGuard tunnel from your PC to a public-IP VPS. No router involved.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>wireguard</span><span>vpn</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+            <a href="lab-001-dns.html" class="lab-card reveal" data-tags="debian lab dns networking">
+                <div class="lab-top"><span class="lab-file">lab-001-dns.html</span><span class="lab-type t-lab">Lab 001</span></div>
+                <h3 class="lab-title" data-i18n="lab001.t">Fix DNS on Debian</h3>
+                <p class="lab-desc" data-i18n="lab001.d">Resolving “Temporary failure in name resolution” with a sane /etc/resolv.conf, and the permanent fix with systemd-resolved.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>dns</span><span>networking</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+            <a href="lab-004-nas.html" class="lab-card reveal" data-tags="debian lab nas storage">
+                <div class="lab-top"><span class="lab-file">lab-004-nas.html</span><span class="lab-type t-lab">Lab 004</span></div>
+                <h3 class="lab-title" data-i18n="lab004.t">Home NAS</h3>
+                <p class="lab-desc" data-i18n="lab004.d">A simple NAS with Debian + Samba to share files across your LAN and homelab.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>samba</span><span>storage</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+            <a href="debian-13-sources.html" class="lab-card reveal" data-tags="debian repos apt config">
+                <div class="lab-top"><span class="lab-file">debian-13-sources.html</span><span class="lab-type" data-i18n="type.config">Config</span></div>
+                <h3 class="lab-title" data-i18n="labsrc.t">Debian 13 sources.list</h3>
+                <p class="lab-desc" data-i18n="labsrc.d">Recommended /etc/apt/sources.list for Trixie: main, contrib, non-free, firmware and backports.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>apt</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+            <a href="arch-configs.html" class="lab-card reveal" data-tags="arch cachyos linux desktop config">
+                <div class="lab-top"><span class="lab-file">arch-configs.html</span><span class="lab-type" data-i18n="type.notes">Notes</span></div>
+                <h3 class="lab-title" data-i18n="labarch.t">Arch / CachyOS base configs</h3>
+                <p class="lab-desc" data-i18n="labarch.d">Base setup for CachyOS / Arch: dotfiles, terminal, zsh, powerlevel10k and bspwm.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>arch</span><span>cachyos</span><span>dotfiles</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+            <a href="python-intro.html" class="lab-card reveal" data-tags="python beginner guide programming">
+                <div class="lab-top"><span class="lab-file">python-intro.html</span><span class="lab-type" data-i18n="type.guide">Guide</span></div>
+                <h3 class="lab-title" data-i18n="labpy.t">Python for beginners</h3>
+                <p class="lab-desc" data-i18n="labpy.d">From zero: variables, conditionals, loops, functions, and solved exercises for students with no prior programming.</p>
+                <div class="lab-foot"><div class="lab-tags"><span>python</span><span>beginner</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+            </a>
+        </div>
+        <div class="labs-empty" data-i18n="labs.empty">Nothing here yet for that filter.</div>
+    </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="section" id="about">
+    <div class="container">
+        <div class="section-head reveal">
+            <div>
+                <div class="eyebrow">whoami</div>
+                <h2 class="section-title" data-i18n="about.title">About me</h2>
             </div>
         </div>
-    </section>
+        <div class="about-grid">
+            <div class="about-text reveal">
+                <p data-i18n-html="about.p1">I'm <strong>Jaren Bailon</strong>, a Networks &amp; Cybersecurity graduate from SENATI, Peru. I run a Linux homelab, break things on purpose, and write them down so the next person doesn't have to.</p>
+                <p data-i18n="about.p2">My focus is Linux server security: SSH hardening, firewall configuration, automatic updates, intrusion prevention. Not flashy work. Boring, reliable, documented.</p>
+                <p data-i18n="about.p3">This site is my public log. If you need someone to lock down a VPS without overselling, you're in the right place.</p>
+                <div class="about-quote" data-i18n="about.quote">The best security setup is the one you can explain, reverse, and re-apply in two years.</div>
+            </div>
+            <aside class="facts reveal">
+                <dl>
+                    <dt data-i18n="fact.k.loc">location</dt><dd data-i18n="fact.loc">Peru · GMT-5</dd>
+                    <dt data-i18n="fact.k.edu">education</dt><dd data-i18n="fact.edu">SENATI, Networks &amp; Cybersecurity (2025)</dd>
+                    <dt data-i18n="fact.k.certs">certs</dt><dd>5× Cisco NetAcad</dd>
+                    <dt data-i18n="fact.k.daily">daily driver</dt><dd>Debian 13 (trixie) · bspwm</dd>
+                    <dt data-i18n="fact.k.lang">languages</dt><dd data-i18n="fact.lang">Spanish (native) · English</dd>
+                    <dt data-i18n="fact.k.status">status</dt><dd class="ok" data-i18n="fact.status">Open to freelance work</dd>
+                </dl>
+            </aside>
+        </div>
 
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand"><em>Jaren Bailon</em></div>
-            <div class="footer-meta">© <span id="year">2026</span></div>
-            <div class="footer-social">
-                <a href="https://github.com/AngheloBR" class="social-link" aria-label="GitHub" target="_blank" rel="noopener">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                </a>
-                <a href="https://fiverr.com/jaren_anghelo" class="social-link" aria-label="Fiverr" target="_blank" rel="noopener">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="9" y2="17"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="14" y2="13"/><circle cx="15.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-                </a>
-                <a href="mailto:jarenbaylon@gmail.com" class="social-link" aria-label="Email">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                </a>
+        <div class="cta-band reveal">
+            <div>
+                <h2 data-i18n="cta.title">Got a server that's still on defaults?</h2>
+                <p data-i18n="cta.sub">Send me the distro and what it will run. I'll tell you which tier fits before you order anything.</p>
+            </div>
+            <a href="https://fiverr.com/jaren_anghelo" class="btn btn-primary" target="_blank" rel="noopener">
+                <span data-i18n="cta.btn">Message me on Fiverr</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">Jaren Bailon</div>
+                <p class="footer-tag" data-i18n="footer.tag">Linux server hardening, documented. Labs and notes from a homelab in Peru.</p>
+            </div>
+            <div>
+                <div class="footer-col-title" data-i18n="footer.site">Site</div>
+                <ul class="footer-links">
+                    <li><a href="#changes" data-i18n="nav.changes">What changes</a></li>
+                    <li><a href="#pricing" data-i18n="nav.pricing">Pricing</a></li>
+                    <li><a href="#labs" data-i18n="nav.labs">Labs</a></li>
+                    <li><a href="#about" data-i18n="nav.about">About</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title" data-i18n="footer.elsewhere">Elsewhere</div>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/AngheloBR" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>GitHub</a></li>
+                    <li><a href="https://fiverr.com/jaren_anghelo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="9" y2="17"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="14" y2="13"/></svg>Fiverr</a></li>
+                    <li><a href="mailto:jarenbaylon@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</a></li>
+                </ul>
             </div>
         </div>
-    </footer>
+        <div class="footer-meta">
+            <span>© <span data-year>2026</span> Jaren Bailon</span>
+            <span data-i18n="footer.built">Built by hand · no framework · GitHub Pages</span>
+        </div>
+    </div>
+</footer>
 
-    <script>
-        const translations = {
-            en: {
-                'nav.services': 'Services', 'nav.labs': 'Labs', 'nav.about': 'About',
-                'hero.label': 'Available for freelance · Based in Peru',
-                'hero.title1': 'Linux server security',
-                'hero.title2': '& <em>hardening</em>, documented.',
-                'hero.sub': "I'm Jaren — a Networks & Cybersecurity student who breaks things in labs so you don't have to break them in production. I harden Linux VPS for developers, small teams & agencies.",
-                'hero.cta1': 'Hire me on Fiverr', 'hero.cta2': 'Browse labs',
-                'stats.focus': 'Focus', 'stats.focus.val': 'Linux-first',
-                'stats.supports': 'I support', 'stats.stack': 'Stack', 'stats.certs': 'Certs',
-                'distros.label': 'Supported distros',
-                'services.title': 'What I <em>offer</em>',
-                'services.intro': "You just rented a VPS. By default it's wide open — weak SSH, no firewall, root exposed. I lock it down following security best practices, document every change, and hand it back ready for you to deploy.",
-                'services.cta': 'View gig on Fiverr',
-                'tier.basic.name': 'Basic', 'tier.basic.desc': 'Essential hardening for a freshly provisioned VPS.',
-                'tier.std.name': 'Standard', 'tier.std.desc': 'Full hardening + Docker ready + documentation.',
-                'tier.prem.name': 'Premium', 'tier.prem.desc': 'Standard + custom SSH port, audit & priority support.',
-                'feat.user': 'Admin user with SSH key', 'feat.root': 'Root login disabled',
-                'feat.fw': 'Firewall (UFW / firewalld)', 'feat.f2b': 'Fail2Ban setup',
-                'feat.updates': 'Automatic security updates', 'feat.docker': 'Docker + Compose installed',
-                'feat.docker.basic': 'No Docker setup', 'feat.report': 'PDF report of all changes',
-                'feat.report.basic': 'No PDF report', 'feat.std': 'Everything in Standard',
-                'feat.port': 'Custom SSH port', 'feat.audit': 'Lynis security audit report',
-                'feat.priority': 'Priority response (~24h)', 'feat.warranty': '14-day post-delivery support',
-                'labs.title': 'Labs & <em>notes</em>',
-                'filter.all': 'All', 'filter.lab': 'Labs', 'filter.sec': 'Security', 'filter.python': 'Python',
-                'type.lab': 'Lab', 'type.config': 'Config', 'type.notes': 'Notes', 'type.guide': 'Guide',
-                'lab.read': 'Read details →',
-                'lab003.title': 'Hardening Debian',
-                'lab003.desc': 'Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates.',
-                'lab002.title': 'VPN PC → VPS',
-                'lab002.desc': 'Simple VPN setup from your PC to a public-IP VPS using WireGuard — no router dependency.',
-                'lab001.title': 'Fix DNS Debian',
-                'lab001.desc': "Resolving the 'Temporary failure in name resolution' error by creating /etc/resolv.conf with safe public DNS servers.",
-                'lab004.title': 'Home NAS',
-                'lab004.desc': 'Simple NAS build with Debian + Samba to share files across your local network and homelab.',
-                'labsrc.desc': 'Recommended /etc/apt/sources.list configuration for Debian 13 (Trixie) — main, contrib, non-free, firmware & backports.',
-                'labarch.title': 'Arch / CachyOS base configs',
-                'labarch.desc': 'Space to document my CachyOS / Arch base configuration: dotfiles, terminal, zsh, powerlevel10k and more.',
-                'labpy.title': 'Python for Beginners',
-                'labpy.desc': 'Practical Python guide from scratch: variables, conditionals, loops, functions, and solved exercises for students with no prior programming experience.',
-                'about.title': 'About <em>me</em>',
-                'about.p1': "I'm Jaren Bailon, a Networks & Cybersecurity graduate from SENATI (Peru). I run my own Linux homelab, break things on purpose, and write it down so the next person doesn't have to.",
-                'about.p2': 'My focus is Linux server security: SSH hardening, firewall configuration, automated updates, intrusion prevention. Not flashy work — boring, reliable, documented.',
-                'about.p3': "I keep this site as a public log of what I learn. If you need someone to harden your VPS without overselling, you're in the right place.",
-                'about.quote': '"The best security setup is the one you can explain, reverse, and re-apply in two years."',
-                'about.side': 'Quick facts',
-                'fact.peru': 'Peru 🇵🇪 · GMT-5', 'fact.grad': 'SENATI graduate (2025)',
-                'fact.field': 'Networks & Cybersecurity', 'fact.certs': '5× Cisco NetAcad certs',
-                'fact.os': 'CachyOS / bspwm daily driver', 'fact.open': 'Open to freelance work'
-            },
-            es: {
-                'nav.services': 'Servicios', 'nav.labs': 'Labs', 'nav.about': 'Sobre mí',
-                'hero.label': 'Disponible para freelance · Desde Perú',
-                'hero.title1': 'Seguridad y',
-                'hero.title2': '<em>hardening</em> de servidores Linux.',
-                'hero.sub': 'Soy Jaren — estudiante de Redes y Ciberseguridad. Rompo cosas en mis labs para que tú no las rompas en producción. Protejo VPS Linux para developers, equipos pequeños y agencias.',
-                'hero.cta1': 'Contrátame en Fiverr', 'hero.cta2': 'Ver labs',
-                'stats.focus': 'Enfoque', 'stats.focus.val': 'Linux-first',
-                'stats.supports': 'Soporto', 'stats.stack': 'Stack', 'stats.certs': 'Certs',
-                'distros.label': 'Distros soportadas',
-                'services.title': 'Lo que <em>ofrezco</em>',
-                'services.intro': 'Acabas de contratar un VPS. Por defecto está completamente expuesto — SSH débil, sin firewall, root accesible. Yo lo bloqueo siguiendo buenas prácticas, documento cada cambio y te lo devuelvo listo para desplegar.',
-                'services.cta': 'Ver gig en Fiverr',
-                'tier.basic.name': 'Básico', 'tier.basic.desc': 'Hardening esencial para un VPS recién contratado.',
-                'tier.std.name': 'Standard', 'tier.std.desc': 'Hardening completo + Docker listo + documentación.',
-                'tier.prem.name': 'Premium', 'tier.prem.desc': 'Standard + puerto SSH personalizado, auditoría y soporte prioritario.',
-                'feat.user': 'Usuario admin con llave SSH', 'feat.root': 'Login de root deshabilitado',
-                'feat.fw': 'Firewall (UFW / firewalld)', 'feat.f2b': 'Configuración de Fail2Ban',
-                'feat.updates': 'Actualizaciones automáticas de seguridad', 'feat.docker': 'Docker + Compose instalados',
-                'feat.docker.basic': 'Sin instalación de Docker', 'feat.report': 'Reporte PDF de todos los cambios',
-                'feat.report.basic': 'Sin reporte PDF', 'feat.std': 'Todo lo del plan Standard',
-                'feat.port': 'Puerto SSH personalizado', 'feat.audit': 'Reporte de auditoría con Lynis',
-                'feat.priority': 'Respuesta prioritaria (~24h)', 'feat.warranty': 'Soporte post-entrega de 14 días',
-                'labs.title': 'Labs y <em>notas</em>',
-                'filter.all': 'Todos', 'filter.lab': 'Labs', 'filter.sec': 'Seguridad', 'filter.python': 'Python',
-                'type.lab': 'Lab', 'type.config': 'Config', 'type.notes': 'Notas', 'type.guide': 'Guía',
-                'lab.read': 'Ver detalles →',
-                'lab003.title': 'Hardening Debian',
-                'lab003.desc': 'Checklist de hardening inicial para un servidor Debian 13: usuarios, sudo, SSH, firewall y actualizaciones automáticas.',
-                'lab002.title': 'VPN PC → VPS',
-                'lab002.desc': 'Configuración de una VPN sencilla desde tu PC hacia un servidor VPS con IP pública usando WireGuard, sin depender del router.',
-                'lab001.title': 'Fix DNS Debian',
-                'lab001.desc': 'Resolución del error "Fallo temporal al resolver deb.debian.org" creando /etc/resolv.conf con servidores DNS públicos seguros.',
-                'lab004.title': 'NAS casero',
-                'lab004.desc': 'Montaje de un NAS sencillo con Debian usando Samba para compartir archivos en tu red local y homelab.',
-                'labsrc.desc': 'Configuración recomendada de /etc/apt/sources.list para Debian 13 (Trixie), incluyendo main, non-free, contrib, firmware y backports.',
-                'labarch.title': 'Configs base Arch / CachyOS',
-                'labarch.desc': 'Espacio reservado para documentar mi configuración base de CachyOS/Arch: dotfiles, terminal, zsh, powerlevel10k, etc.',
-                'labpy.title': 'Python para Principiantes',
-                'labpy.desc': 'Guía práctica de Python desde cero: variables, condicionales, bucles, funciones y ejercicios resueltos para estudiantes sin experiencia previa en programación.',
-                'about.title': 'Sobre <em>mí</em>',
-                'about.p1': 'Soy Jaren Bailon, egresado de Redes y Ciberseguridad en SENATI (Perú). Administro mi propio homelab con Linux, rompo cosas a propósito y lo documento para que la próxima persona no tenga que hacerlo.',
-                'about.p2': 'Mi enfoque es la seguridad de servidores Linux: hardening de SSH, configuración de firewall, actualizaciones automáticas, prevención de intrusiones. Trabajo aburrido — confiable, documentado y sin adornos.',
-                'about.p3': 'Mantengo este sitio como un registro público de lo que aprendo. Si necesitas a alguien que endurezca tu VPS sin exagerar lo que ofrece, estás en el lugar correcto.',
-                'about.quote': '"La mejor configuración de seguridad es la que puedes explicar, revertir y volver a aplicar dentro de dos años."',
-                'about.side': 'Datos rápidos',
-                'fact.peru': 'Perú 🇵🇪 · GMT-5', 'fact.grad': 'Egresado de SENATI (2025)',
-                'fact.field': 'Redes y Ciberseguridad', 'fact.certs': '5× certs de Cisco NetAcad',
-                'fact.os': 'CachyOS / bspwm a diario', 'fact.open': 'Abierto a trabajos freelance'
-            }
-        };
-
-        let currentLang = 'en';
-
-        function applyLang(lang) {
-            currentLang = lang;
-            document.documentElement.setAttribute('lang', lang);
-            document.getElementById('langText').textContent = lang === 'en' ? 'ES' : 'EN';
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) el.textContent = translations[lang][key];
-            });
-            document.querySelectorAll('[data-i18n-html]').forEach(el => {
-                const key = el.getAttribute('data-i18n-html');
-                if (translations[lang][key]) el.innerHTML = translations[lang][key];
-            });
-        }
-
-        function toggleLang() {
-            const next = currentLang === 'en' ? 'es' : 'en';
-            applyLang(next);
-            try { localStorage.setItem('lang', next); } catch(e) {}
-        }
-
-        (function initLang() {
-            let saved = null;
-            try { saved = localStorage.getItem('lang'); } catch(e) {}
-            if (saved === 'es' || saved === 'en') { applyLang(saved); return; }
-            const browserLang = (navigator.language || 'en').toLowerCase();
-            applyLang(browserLang.startsWith('es') ? 'es' : 'en');
-        })();
-
-        function toggleTheme() {
-            const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            try { localStorage.setItem('theme', next); } catch(e) {}
-        }
-        (function initTheme() {
-            try {
-                const saved = localStorage.getItem('theme');
-                if (saved) document.documentElement.setAttribute('data-theme', saved);
-            } catch(e) {}
-        })();
-
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                const filter = chip.getAttribute('data-filter');
-                document.querySelectorAll('.lab-card').forEach(card => {
-                    const tags = card.getAttribute('data-tags') || '';
-                    if (filter === 'all' || tags.includes(filter)) card.classList.remove('hidden');
-                    else card.classList.add('hidden');
-                });
-            });
-        });
-
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+<script src="assets/vendor/three.r128.min.js" defer></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/home.js" defer></script>
+<script src="assets/scene.js" defer></script>
 </body>
 </html>
