@@ -20,6 +20,8 @@
         // Theme + language before first paint, so nothing flashes.
         (function () {
             var d = document.documentElement; d.classList.add('js');
+            // If site.js never runs, don't leave scroll-reveal content invisible.
+            setTimeout(function () { if (!window.__siteJs) d.classList.add('reveal-fallback'); }, 2500);
             try {
                 var t = localStorage.getItem('theme');
                 if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -97,9 +99,10 @@
         <section class="scene" id="scene" data-state="stock" aria-label="Interactive demo: a stock server gets broken into until you harden it">
             <div class="scene-corner tl"><i aria-hidden="true"></i><b>srv-debian</b><span class="t-stock" data-i18n="scene.stock.label">· stock config</span><span class="t-hardened" data-i18n="scene.hardened.label">· hardened</span></div>
             <div class="scene-switch" role="group" aria-label="Server state">
-                <button type="button" data-set="stock" data-i18n="scene.sw.stock">stock</button>
-                <button type="button" data-set="hardened" data-i18n="scene.sw.hardened">hardened</button>
+                <button type="button" data-set="stock" aria-pressed="true" data-i18n="scene.sw.stock">stock</button>
+                <button type="button" data-set="hardened" aria-pressed="false" data-i18n="scene.sw.hardened">hardened</button>
             </div>
+            <div class="scene-bottom">
             <button type="button" class="scene-cta" id="hardenBtn">
                 <span data-i18n="scene.harden">Harden this server</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -111,6 +114,8 @@
                 </div>
                 <div class="hud-lines" id="hudLines"></div>
             </div>
+            </div>
+            <p class="sr-only" id="sceneLive" aria-live="polite"></p>
         </section>
     </div>
 </section>
@@ -312,10 +317,10 @@
         </div>
 
         <div class="filters reveal" role="group" aria-label="Filter labs">
-            <button class="chip active" type="button" data-filter="all" data-i18n="filter.all">All</button>
-            <button class="chip" type="button" data-filter="lab" data-i18n="filter.lab">Labs</button>
-            <button class="chip" type="button" data-filter="security" data-i18n="filter.sec">Security</button>
-            <button class="chip" type="button" data-filter="networking" data-i18n="filter.net">Networking</button>
+            <button class="chip active" type="button" aria-pressed="true" data-filter="all" data-i18n="filter.all">All</button>
+            <button class="chip" type="button" aria-pressed="false" data-filter="lab" data-i18n="filter.lab">Labs</button>
+            <button class="chip" type="button" aria-pressed="false" data-filter="security" data-i18n="filter.sec">Security</button>
+            <button class="chip" type="button" aria-pressed="false" data-filter="networking" data-i18n="filter.net">Networking</button>
         </div>
 
         <div class="labs-grid" id="labsGrid">

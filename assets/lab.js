@@ -17,6 +17,7 @@
         return a;
     });
     document.body.appendChild(nav);
+    document.body.classList.add('has-toc');
     nav.classList.add('ready');
 
     const io = new IntersectionObserver(entries => {

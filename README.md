@@ -18,6 +18,12 @@ assets/scene.js       The perimeter: server starts on stock config (attackers ge
 assets/vendor/        three.r128.min.js (vendored, no CDN dependency).
 ```
 
+## Other files
+
+- `404.html` is served by GitHub Pages for any missing path, so it uses root-absolute URLs (`/assets/...`).
+- `og.png` is the social preview; regenerate it by screenshotting `_og.html` at 1200×630.
+- `assets/fonts/` holds self-hosted woff2 files (OFL, see LICENSE.txt). Files starting with `_` are not published.
+
 ## Adding a lab
 
 1. Copy any `lab-00x-*.html`, keep the `<head>` and nav/footer, write the content inside `.content`.

@@ -23,12 +23,52 @@ function bootScene() {
     let hardenT = -1, stepsDone = 0;
     let rootLogins = 0, denied = 0, allowed = 0;
 
-    function setState(next) {
+    const live = document.getElementById('sceneLive');
+    const es = document.documentElement.lang === 'es';
+    function announce(next, prev) {
+        if (!live || prev === undefined) return;
+        if (next === 'hardened') live.textContent = es
+            ? 'Servidor endurecido: ' + HARDEN_STEPS.length + ' cambios aplicados. Los intentos de acceso ahora se bloquean.'
+            : 'Server hardened: ' + HARDEN_STEPS.length + ' changes applied. Intrusion attempts are now blocked.';
+        else if (next === 'stock' && prev !== 'stock') live.textContent = es
+            ? 'Servidor de vuelta a la configuración de fábrica.'
+            : 'Server back to stock config.';
+    }
+    function setState(next, silent) {
+        const prev = silent ? undefined : state;
         state = next;
         box.setAttribute('data-state', next);
-        switchBtns.forEach(b => b.classList.toggle('on', b.dataset.set === (next === 'stock' ? 'stock' : 'hardened')));
+        switchBtns.forEach(b => {
+            const on = b.dataset.set === (next === 'stock' ? 'stock' : 'hardened');
+            b.classList.toggle('on', on);
+            b.setAttribute('aria-pressed', String(on));
+        });
         updateCount();
+        announce(next, prev);
     }
+    function resetToStock() {
+        if (state === 'stock') return false;
+        setState('stock');
+        hardenT = -1;
+        stockClock = 0;
+        rootLogins = 0; updateCount();
+        push('sshd', 'RESET', 'warn', 'stock config restored');
+        return true;
+    }
+
+    // Controls are wired once; each render mode (3D, reduced motion, no WebGL) supplies its actions.
+    let actions = null;
+    if (hardenBtn) hardenBtn.addEventListener('click', () => { userTouched = true; if (actions) actions.harden(); });
+    switchBtns.forEach(b => b.addEventListener('click', () => {
+        userTouched = true;
+        if (!actions) return;
+        if (b.dataset.set === 'hardened') actions.harden(); else actions.unharden();
+    }));
+
+    // Only count toward auto-harden while the scene is actually on screen.
+    let inView = false;
+    if ('IntersectionObserver' in window) new IntersectionObserver(e => { inView = e[0].isIntersecting; }, { threshold: .3 }).observe(box);
+    else inView = true;
     function updateCount() {
         if (!counter) return;
         counter.textContent = state === 'stock'
@@ -89,7 +129,7 @@ function bootScene() {
     push('sshd', 'FAIL', 'warn', 'root@' + ip() + ' · password');
     push('ufw', '—', 'warn', 'inactive');
     rootLogins = 1; push('sshd', 'ACCEPT', 'deny', 'root@' + ip() + ' · password');
-    setState('stock');
+    setState('stock', true);
 
     // ---------- 3D (runs once three.js has loaded, or failed to) ----------
     loadThree(init3D);
@@ -101,20 +141,21 @@ function bootScene() {
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
         } catch (e) {
             // No WebGL: the HUD alone tells the story, on a timer.
-            wireControls();
+            function hardenNoGL() {
+                if (state !== 'stock') return;
+                setState('hardening');
+                const gap = reduced ? 0 : 380;
+                HARDEN_STEPS.forEach((s, i) => setTimeout(() => push(s[0], 'APPLY', 'cfg', s[1], 'cfg'), i * gap));
+                setTimeout(() => { if (state === 'hardening') setState('hardened'); }, HARDEN_STEPS.length * gap + 200);
+            }
+            actions = { harden: hardenNoGL, unharden: resetToStock };
             if (!reduced) {
-                let t = 0;
                 setInterval(() => {
-                    if (state === 'stock') { logStockHit(); t += 1.2; if (t > AUTO_HARDEN_AFTER && !userTouched) hardenNoGL(); }
+                    if (!inView) return;
+                    if (state === 'stock') { logStockHit(); stockClock += 1.2; if (stockClock > AUTO_HARDEN_AFTER && !userTouched) hardenNoGL(); }
                     else if (state === 'hardened') Math.random() < .15 ? logAllow() : logDeny();
                 }, 1200);
-            } else { setState('hardened'); }
-            function hardenNoGL() {
-                setState('hardening');
-                HARDEN_STEPS.forEach((s, i) => setTimeout(() => push(s[0], 'APPLY', 'cfg', s[1], 'cfg'), i * 380));
-                setTimeout(() => setState('hardened'), HARDEN_STEPS.length * 380 + 200);
             }
-            window.__harden = hardenNoGL;
             return;
         }
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
@@ -278,14 +319,6 @@ function bootScene() {
             setState('hardening');
             hardenT = 0; stepsDone = 0;
         }
-        function unharden() {
-            if (state === 'stock') return;
-            setState('stock');
-            hardenT = -1;
-            stockClock = 0;
-            rootLogins = 0; updateCount();
-            push('sshd', 'RESET', 'warn', 'stock config restored');
-        }
         function finishHarden() {
             setBuild(1);
             setState('hardened');
@@ -294,14 +327,7 @@ function bootScene() {
             // attackers already inside the new perimeter just vanish
             packets.forEach(p => { if (!p.allow && p.r < SHELL_R) resetPacket(p, false); });
         }
-        function wireControls() {
-            if (hardenBtn) hardenBtn.addEventListener('click', () => { userTouched = true; (window.__harden || harden)(); });
-            switchBtns.forEach(b => b.addEventListener('click', () => {
-                userTouched = true;
-                if (b.dataset.set === 'hardened') (window.__harden || harden)(); else unharden();
-            }));
-        }
-        wireControls();
+        actions = { harden, unharden: resetToStock };
 
         // ---- loop ----
         let visible = true, running = false;
@@ -317,7 +343,7 @@ function bootScene() {
             const stock = state === 'stock';
 
             // auto-harden if the visitor just watches
-            if (stock && !userTouched) { stockClock += dt; if (stockClock > AUTO_HARDEN_AFTER) harden(); }
+            if (stock && !userTouched && inView) { stockClock += dt; if (stockClock > AUTO_HARDEN_AFTER) harden(); }
 
             // hardening sequence: shell grows, config lines land
             if (state === 'hardening') {
@@ -406,16 +432,22 @@ function bootScene() {
         function start() { if (!running) { running = true; clock.getDelta(); frame(); } }
 
         if (reduced) {
-            // Still picture, already hardened. The switch still works, just without the build animation.
+            // Still picture. Starts on stock; the button and switch change state instantly, without animation.
             function still() {
                 packets.forEach((p, i) => { p.mesh.visible = i < 12; tmp.copy(p.dir).multiplyScalar(p.r); p.mesh.position.copy(tmp); setTrail(i, i < 12 ? p : null); });
                 trailGeo.attributes.position.needsUpdate = true; trailGeo.attributes.color.needsUpdate = true;
                 leds.forEach(l => { l.material.color.set(state === 'stock' ? 0xf0525a : (l.userData.status ? 0x34d399 : 0xf5a524)); l.visible = true; });
                 renderer.render(scene, camera);
             }
-            window.__harden = function () { if (state === 'stock') { HARDEN_STEPS.forEach(s => push(s[0], 'APPLY', 'cfg', s[1], 'cfg')); setBuild(1); setState('hardened'); still(); } };
-            switchBtns.forEach(b => { if (b.dataset.set === 'stock') b.addEventListener('click', () => { setBuild(0); still(); }); });
-            setBuild(1); setState('hardened'); still();
+            actions = {
+                harden() {
+                    if (state !== 'stock') return;
+                    HARDEN_STEPS.forEach(s => push(s[0], 'APPLY', 'cfg', s[1], 'cfg'));
+                    setBuild(1); setState('hardened'); still();
+                },
+                unharden() { if (resetToStock()) { setBuild(0); still(); } }
+            };
+            setBuild(0); still();
             window.addEventListener('themechange', still);
             new ResizeObserver(still).observe(box);
             return;

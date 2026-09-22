@@ -117,7 +117,7 @@
     const grid = document.getElementById('labsGrid');
     const cards = grid ? Array.from(grid.querySelectorAll('.lab-card')) : [];
     chips.forEach(chip => chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.toggle('active', c === chip));
+        chips.forEach(c => { c.classList.toggle('active', c === chip); c.setAttribute('aria-pressed', String(c === chip)); });
         const f = chip.dataset.filter;
         let shown = 0;
         cards.forEach(card => {
@@ -126,6 +126,7 @@
             if (on) { shown++; card.classList.add('in'); }
         });
         grid.classList.toggle('empty', shown === 0);
+        grid.classList.toggle('filtered', f !== 'all');
     }));
 
     // ---- diff line stagger index ----

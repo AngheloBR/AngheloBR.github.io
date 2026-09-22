@@ -1,6 +1,7 @@
 /* site.js — theme, mobile menu, footer year, copy buttons, scroll reveal.
    Theme is applied early by the inline script in <head>; this only wires the toggle. */
 (function () {
+    window.__siteJs = true;
     const root = document.documentElement;
 
     // ---- theme ----
@@ -31,7 +32,7 @@
 
     // ---- copy buttons on <pre> ----
     const copyLabel = root.lang === 'es' ? ['Copiar', 'Copiado'] : ['Copy', 'Copied'];
-    document.querySelectorAll('pre').forEach(pre => {
+    document.querySelectorAll('pre:not(.no-copy)').forEach(pre => {
         const btn = document.createElement('button');
         btn.className = 'copy-btn';
         btn.type = 'button';
