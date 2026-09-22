@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jaren Bailon — Linux server hardening</title>
-    <meta name="description" content="I harden Linux VPS for developers, small teams and agencies: SSH keys only, root locked out, firewall, Fail2Ban, automatic updates. Every change documented in a PDF.">
+    <meta name="description" content="I harden Linux VPS for developers, small teams and agencies: SSH keys only, root locked out, firewall, Fail2Ban, automatic updates. Every change documented and reversible.">
     <meta property="og:title" content="Jaren Bailon — Linux server hardening">
     <meta property="og:description" content="Your new VPS is wide open. I close it, and hand you the paper trail.">
     <meta property="og:type" content="website">
@@ -71,7 +71,7 @@
                 <span data-i18n="hero.h1">Your new VPS is wide open.</span>
                 <span class="line-2" data-i18n="hero.h2">I close it, and hand you the paper trail.</span>
             </h1>
-            <p class="hero-sub" data-i18n-html="hero.sub">SSH keys only, root locked out, firewall up, Fail2Ban watching, security updates on autopilot. <strong>Every change goes into a PDF</strong> you can audit, reverse, or redo in two years.</p>
+            <p class="hero-sub" data-i18n-html="hero.sub">SSH keys only, root locked out, firewall up, Fail2Ban watching, security updates on autopilot. <strong>Every change is written down</strong>, so you can audit it, reverse it, or redo it in two years.</p>
             <div class="hero-cta">
                 <a href="https://fiverr.com/jaren_anghelo" class="btn btn-primary" target="_blank" rel="noopener">
                     <span data-i18n="hero.cta1">Hire me on Fiverr</span>
@@ -144,7 +144,7 @@
                     <div class="diff-line add"><span class="ln">9</span><span class="sym">+</span><span>unattended-upgrades: security updates, daily</span></div>
                     <div class="diff-line del"><span class="ln">10</span><span class="sym">−</span><span>docker: not installed</span></div>
                     <div class="diff-line add"><span class="ln">10</span><span class="sym">+</span><span>docker + compose: installed · DOCKER-USER chain wired to ufw <span class="c"># Standard+</span></span></div>
-                    <div class="diff-line add"><span class="ln">11</span><span class="sym">+</span><span>report.pdf: every change, with rollback notes</span></div>
+                    <div class="diff-line add"><span class="ln">11</span><span class="sym">+</span><span>report.pdf: every change, with rollback notes <span class="c"># Standard+</span></span></div>
                 </div>
             </div>
 
@@ -168,8 +168,8 @@
                     <p data-i18n="why.3.p">Security patches land on their own. You don't have to SSH in at 2 a.m. because a CVE dropped.</p>
                 </div>
                 <div class="why-item">
-                    <h3><span data-i18n="why.4.t">Paper trail</span> <code>report.pdf</code></h3>
-                    <p data-i18n="why.4.p">Every command, why it ran, and how to undo it. If you ever need to move to another provider, you can redo the whole thing yourself.</p>
+                    <h3><span data-i18n="why.4.t">Paper trail</span> <code>summary · report.pdf</code></h3>
+                    <p data-i18n="why.4.p">Every change, why it was made, and how to undo it: a written summary on Basic, a full PDF report from Standard up. If you ever move providers, you can redo it yourself.</p>
                 </div>
             </div>
         </div>
@@ -195,7 +195,7 @@
             </div>
             <div class="step reveal">
                 <div class="step-num">2</div>
-                <div class="step-meta" data-i18n="step.2.m">1–4 h, by tier</div>
+                <div class="step-meta" data-i18n="step.2.m">scope depends on the tier</div>
                 <h3 data-i18n="step.2.t">Harden</h3>
                 <p data-i18n="step.2.p">Apply the changes above, one at a time, testing each from a second connection. Custom port, Docker, TLS and the Lynis audit depend on the tier.</p>
             </div>
@@ -234,7 +234,7 @@
             <div class="tier reveal">
                 <div class="tier-name">Basic <span class="tier-alias" data-i18n="tier.basic.alias">· Lockdown</span></div>
                 <div class="tier-price"><small>$</small>30</div>
-                <div class="tier-meta"><span data-i18n="tier.basic.time">~1.5 h of work</span> · <span data-i18n="tier.basic.eta">1-day delivery</span></div>
+                <div class="tier-meta"><span data-i18n="tier.basic.eta">1-day delivery</span></div>
                 <p class="tier-desc" data-i18n="tier.basic">You just bought a VPS and want it closed today.</p>
                 <ul class="tier-features">
                     <li data-i18n="feat.user">Sudo user with SSH key</li>
@@ -249,10 +249,10 @@
                 <a href="https://fiverr.com/jaren_anghelo" class="btn btn-secondary" target="_blank" rel="noopener" data-i18n="tier.cta">Order on Fiverr</a>
             </div>
             <div class="tier featured reveal">
-                <div class="tier-flag" data-i18n="tier.flag">Most picked</div>
+                <div class="tier-flag" data-i18n="tier.flag">Recommended</div>
                 <div class="tier-name">Standard <span class="tier-alias" data-i18n="tier.std.alias">· Deploy-ready</span></div>
                 <div class="tier-price"><small>$</small>75</div>
-                <div class="tier-meta"><span data-i18n="tier.std.time">~3 h of work</span> · <span data-i18n="tier.std.eta">2-day delivery</span></div>
+                <div class="tier-meta"><span data-i18n="tier.std.eta">2-day delivery</span></div>
                 <p class="tier-desc" data-i18n="tier.std">You're about to deploy Docker, n8n or Coolify and want the box ready.</p>
                 <ul class="tier-features">
                     <li data-i18n="feat.basic">Everything in Basic</li>
@@ -267,7 +267,7 @@
             <div class="tier reveal">
                 <div class="tier-name">Premium <span class="tier-alias" data-i18n="tier.prem.alias">· Audited</span></div>
                 <div class="tier-price"><small>$</small>150</div>
-                <div class="tier-meta"><span data-i18n="tier.prem.time">~5 h of work</span> · <span data-i18n="tier.prem.eta">3-day delivery</span></div>
+                <div class="tier-meta"><span data-i18n="tier.prem.eta">3-day delivery</span></div>
                 <p class="tier-desc" data-i18n="tier.prem">A small business that needs proof it was done right.</p>
                 <ul class="tier-features">
                     <li data-i18n="feat.std">Everything in Standard</li>
@@ -302,7 +302,7 @@
                 <div class="eyebrow" data-i18n="labs.eyebrow">public notebook</div>
                 <h2 class="section-title" data-i18n="labs.title">Labs &amp; notes</h2>
             </div>
-            <p class="section-lede" data-i18n="labs.lede">Everything I apply on a client's box, I first break in my homelab and write up here. Written in Spanish, hands-on, copy-pasteable.</p>
+            <p class="section-lede" data-i18n="labs.lede">What I do on client servers, I practice in my homelab first and write up here. Written in Spanish, hands-on, copy-pasteable.</p>
         </div>
 
         <div class="filters reveal" role="group" aria-label="Filter labs">
@@ -316,7 +316,7 @@
             <a href="lab-003-hardening.html" class="lab-card flagship reveal" data-tags="debian lab security hardening">
                 <div class="lab-top"><span class="lab-file">lab-003-hardening.html</span><span class="lab-type t-lab">Lab 003</span></div>
                 <h3 class="lab-title" data-i18n="lab003.t">Hardening Debian</h3>
-                <p class="lab-desc" data-i18n="lab003.d">Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates. The same list I run on client servers.</p>
+                <p class="lab-desc" data-i18n="lab003.d">Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates. The base of the Basic tier.</p>
                 <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>security</span><span>hardening</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
             </a>
             <a href="lab-002-vpn.html" class="lab-card reveal" data-tags="debian lab security networking vpn wireguard">
