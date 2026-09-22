@@ -7,6 +7,8 @@
     window.toggleTheme = function () {
         const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', next);
+        const meta = document.getElementById('themeColor');
+        if (meta) meta.setAttribute('content', next === 'light' ? '#f2f3f5' : '#0b0d10');
         try { localStorage.setItem('theme', next); } catch (e) {}
         window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
     };

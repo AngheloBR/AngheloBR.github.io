@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debian 13 sources.list — Jaren Bailon</title>
+    <meta name="description" content="Configuración recomendada de /etc/apt/sources.list para Debian 13 Trixie. Incluye repositorios principales, seguridad, actualizaciones y backports.">
+    <link rel="canonical" href="https://anghelobr.github.io/debian-13-sources.html">
+    <meta property="og:title" content="Debian 13 sources.list — Jaren Bailon">
+    <meta property="og:description" content="Configuración recomendada de /etc/apt/sources.list para Debian 13 Trixie. Incluye repositorios principales, seguridad, actualizaciones y backports.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://anghelobr.github.io/debian-13-sources.html">
+    <meta property="og:image" content="https://anghelobr.github.io/og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="theme-color" content="#0b0d10" id="themeColor">
     <script>
         (function () {
             var d = document.documentElement; d.classList.add('js');
@@ -12,12 +23,13 @@
                 var t = localStorage.getItem('theme');
                 if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
                 d.setAttribute('data-theme', t);
+                var m = document.getElementById('themeColor'); if (m) m.setAttribute('content', t === 'light' ? '#f2f3f5' : '#0b0d10');
             } catch (e) {}
         })();
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="assets/fonts/bricolage-grotesque-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/ibm-plex-sans-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/fonts.css">
     <link rel="stylesheet" href="assets/site.css">
     <link rel="stylesheet" href="assets/lab.css">
 </head>
