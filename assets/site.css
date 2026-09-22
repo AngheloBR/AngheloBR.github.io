@@ -75,6 +75,8 @@ button { font: inherit; cursor: pointer; background: none; border: 0; color: inh
 img, svg { display: block; }
 ::selection { background: var(--amber); color: var(--amber-ink); }
 :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+/* Firefox uses these; the ::-webkit-scrollbar rules below cover Chromium/Safari */
+html, pre, .diff-body, .topology-box { scrollbar-color: var(--line-2) transparent; scrollbar-width: thin; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--ink); }
 ::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 5px; }

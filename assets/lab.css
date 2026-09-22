@@ -18,7 +18,8 @@ main .container { max-width: 880px; }
 .page-lang::before { content: ''; width: 18px; height: 1px; background: var(--line-2); }
 
 /* ---------- content ---------- */
-.content section { margin-bottom: 52px; scroll-margin-top: 84px; }
+.content > h2 { margin-top: 52px; scroll-margin-top: 84px; }
+.content > h2:first-child { margin-top: 0; }
 .content h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: -.025em; line-height: 1.15; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
 .step-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-soft); padding: 3px 8px; border-radius: 4px; flex-shrink: 0; letter-spacing: .04em; }
 .content h3 { font-family: var(--font-display); font-weight: 600; font-size: 18px; letter-spacing: -.01em; margin: 22px 0 10px; }
@@ -47,14 +48,19 @@ pre:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
 .copy-btn.done { background: var(--allow); color: var(--ink); border-color: var(--allow); opacity: 1; }
 [data-theme="light"] .copy-btn { background: #2a3040; color: #c9d1dc; border-color: #3a4152; }
 
-/* ---------- callouts ---------- */
-.note { display: flex; gap: 12px; padding: 14px 16px; border-radius: var(--radius); font-size: 14.5px; line-height: 1.6; margin: 16px 0; border: 1px solid; border-left-width: 3px; }
-.note-body { flex: 1; }
-.note-body p { margin: 0; font-size: 14.5px; color: var(--dim); }
-.note-icon { flex-shrink: 0; font-family: var(--font-mono); font-weight: 600; font-size: 14px; margin-top: 1px; }
-.note-info { background: color-mix(in srgb, var(--dim) 7%, transparent); border-color: color-mix(in srgb, var(--dim) 25%, transparent); color: var(--text); }
-.note-warning { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); color: var(--amber); }
-.note-success { background: color-mix(in srgb, var(--allow) 8%, transparent); border-color: color-mix(in srgb, var(--allow) 35%, transparent); color: var(--allow); }
+/* ---------- callouts ----------
+   Markdown:  > text
+              {: .note .note-warning}      (info | warning | success) */
+.note { position: relative; padding: 14px 16px 14px 42px; border-radius: var(--radius); font-size: 14.5px; line-height: 1.6; margin: 16px 0; border: 1px solid; border-left-width: 3px; }
+.note::before { position: absolute; left: 16px; top: 14px; font-family: var(--font-mono); font-weight: 600; font-size: 14px; }
+.content .note p { margin: 0 0 8px; font-size: 14.5px; color: var(--dim); }
+.content .note p:last-child { margin-bottom: 0; }
+.note-info { background: color-mix(in srgb, var(--dim) 7%, transparent); border-color: color-mix(in srgb, var(--dim) 25%, transparent); }
+.note-info::before { content: 'ℹ'; color: var(--text); }
+.note-warning { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+.note-warning::before { content: '⚠'; color: var(--amber); }
+.note-success { background: color-mix(in srgb, var(--allow) 8%, transparent); border-color: color-mix(in srgb, var(--allow) 35%, transparent); }
+.note-success::before { content: '✓'; color: var(--allow); }
 
 /* ---------- topology diagram (lab 002) ---------- */
 .topology-box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; font-family: var(--font-mono); font-size: 13px; color: var(--dim); line-height: 1.8; margin: 14px 0; overflow-x: auto; }
@@ -99,6 +105,8 @@ pre:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
 .lab-nav-center:hover { color: var(--amber); border-color: var(--amber); }
 
 @media (max-width: 768px) {
+    /* room for the copy button above the first line, so it never covers code */
+    pre { padding-top: 44px; }
     .page-header { padding: 36px 0 30px; margin-bottom: 36px; }
     .lab-nav { grid-template-columns: 1fr; }
     .lab-nav-link.prev, .lab-nav-link.next, .lab-nav-center { grid-column: 1; }

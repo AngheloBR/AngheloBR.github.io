@@ -1,0 +1,65 @@
+---
+layout: base
+js: [/assets/site.js, /assets/lab.js]
+---
+{%- assign labs = site.labs | sort: "order" -%}
+{%- for l in labs -%}
+  {%- if l.url == page.url -%}
+    {%- assign i = forloop.index0 -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign prev_i = i | minus: 1 -%}
+{%- assign next_i = i | plus: 1 -%}
+{% include nav-lab.html %}
+
+<main>
+    <div class="container">
+        <header class="page-header">
+            <nav class="breadcrumb">
+                <a href="{{ '/' | relative_url }}">Inicio</a>
+                <span>›</span>
+                <a href="{{ '/#labs' | relative_url }}">Labs</a>
+                <span>›</span>
+                <span>{{ page.crumb }}</span>
+            </nav>
+            <div class="lab-badge">{{ page.badge }}</div>
+            <h1 class="page-title">{{ page.heading }}</h1>
+            <p class="page-desc">{{ page.intro }}</p>
+            <div class="page-lang">Escrito en español · Written in Spanish</div>
+        </header>
+
+        <div class="content">
+{{ content }}
+        </div>
+
+        <nav class="lab-nav">
+{%- if i > 0 %}
+            {%- assign p = labs[prev_i] %}
+            <a href="{{ p.url | relative_url }}" class="lab-nav-link prev">
+                <span class="lab-nav-arrow">←</span>
+                <div class="lab-nav-meta">
+                    <span class="lab-nav-label">Anterior</span>
+                    <span class="lab-nav-title">{{ p.nav_title }}</span>
+                </div>
+            </a>
+{%- else %}
+            <span></span>
+{%- endif %}
+            <a href="{{ '/#labs' | relative_url }}" class="lab-nav-center">Todos los labs</a>
+{%- if next_i < labs.size %}
+            {%- assign n = labs[next_i] %}
+            <a href="{{ n.url | relative_url }}" class="lab-nav-link next">
+                <div class="lab-nav-meta">
+                    <span class="lab-nav-label">Siguiente</span>
+                    <span class="lab-nav-title">{{ n.nav_title }}</span>
+                </div>
+                <span class="lab-nav-arrow">→</span>
+            </a>
+{%- else %}
+            <span></span>
+{%- endif %}
+        </nav>
+    </div>
+</main>
+
+{% include footer-lab.html %}

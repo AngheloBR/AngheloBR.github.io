@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: 'en' }}" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+{%- if page.noindex %}
+    <meta name="robots" content="noindex">
+{%- else %}
+    <meta name="description" content="{{ page.description | strip_html | escape }}">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <meta property="og:title" content="{{ page.og_title | default: page.title | escape }}">
+    <meta property="og:description" content="{{ page.og_description | default: page.description | strip_html | escape }}">
+    <meta property="og:type" content="{{ page.og_type | default: 'article' }}">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <meta property="og:image" content="{{ '/og.png' | absolute_url }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+{%- endif %}
+    <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}">
+    <meta name="theme-color" content="#0b0d10" id="themeColor">
+    <script>
+        // Theme{% if page.i18n %} + language{% endif %} before first paint, so nothing flashes.
+        (function () {
+            var d = document.documentElement; d.classList.add('js');
+{%- if page.reveal %}
+            // If site.js never runs, don't leave scroll-reveal content invisible.
+            setTimeout(function () { if (!window.__siteJs) d.classList.add('reveal-fallback'); }, 2500);
+{%- endif %}
+            try {
+                var t = localStorage.getItem('theme');
+                if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+                d.setAttribute('data-theme', t);
+                var m = document.getElementById('themeColor'); if (m) m.setAttribute('content', t === 'light' ? '#f2f3f5' : '#0b0d10');
+{%- if page.i18n %}
+                var l = localStorage.getItem('lang');
+                if (!l) l = (navigator.language || '').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
+                d.setAttribute('lang', l);
+{%- endif %}
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preload" href="{{ '/assets/fonts/bricolage-grotesque-var.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ '/assets/fonts/ibm-plex-sans-var.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ '/assets/fonts.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+{%- for css in page.css %}
+    <link rel="stylesheet" href="{{ css | relative_url }}">
+{%- endfor %}
+</head>

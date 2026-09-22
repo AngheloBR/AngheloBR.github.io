@@ -1,0 +1,29 @@
+# Jekyll config — built by GitHub Pages (github-pages gem). Local: bundle exec jekyll serve
+title: Jaren Bailon
+url: https://anghelobr.github.io
+baseurl: ""
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  syntax_highlighter_opts:
+    disable: true        # plain <pre><code>, styled by assets/lab.css
+
+# Each lab is one Markdown file in _labs/. URLs stay /lab-xxx.html.
+collections:
+  labs:
+    output: true
+    permalink: /:name.html
+
+defaults:
+  - scope: { path: "", type: labs }
+    values: { layout: lab, lang: es, css: [/assets/lab.css] }
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle

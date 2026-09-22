@@ -62,12 +62,7 @@
         'labs.eyebrow': 'cuaderno público', 'labs.title': 'Labs y notas',
         'labs.lede': 'Lo que hago en servidores de clientes, primero lo practico en mi homelab y lo documento aquí. En español, práctico, para copiar y pegar.',
         'filter.all': 'Todo', 'filter.lab': 'Labs', 'filter.sec': 'Seguridad', 'filter.net': 'Redes',
-        'type.config': 'Config', 'lab.go': 'Leer →',
-        'lab003.t': 'Hardening Debian', 'lab003.d': 'Checklist inicial de hardening para un servidor Debian 13: usuarios, sudo, SSH, firewall y actualizaciones automáticas. La base del plan Basic.',
-        'lab002.t': 'VPN PC → VPS con WireGuard', 'lab002.d': 'Túnel WireGuard directo desde tu PC a un VPS con IP pública. Sin depender del router.',
-        'lab001.t': 'Arreglar DNS en Debian', 'lab001.d': 'Resolver “Temporary failure in name resolution” con un /etc/resolv.conf sano, y la solución permanente con systemd-resolved.',
-        'lab004.t': 'NAS casero', 'lab004.d': 'Un NAS simple con Debian + Samba para compartir archivos en tu red local y homelab.',
-        'labsrc.t': 'sources.list para Debian 13', 'labsrc.d': '/etc/apt/sources.list recomendado para Trixie: main, contrib, non-free, firmware y backports.',
+        'lab.go': 'Leer →',
         'labs.empty': 'Todavía no hay nada con ese filtro.',
 
         'about.title': 'Sobre mí',
@@ -88,6 +83,9 @@
         'footer.site': 'Sitio', 'footer.elsewhere': 'En otros lados',
         'footer.built': 'Hecho a mano · sin framework · GitHub Pages'
     };
+
+    // Lab card strings live in each lab's front matter (_labs/*.md), injected by index.html.
+    Object.assign(es, window.__labsEs || {});
 
     // Capture the English copy from the DOM once, so toggling back is lossless.
     const en = {};

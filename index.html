@@ -1,45 +1,16 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaren Bailon — Linux server hardening</title>
-    <meta name="description" content="I harden Linux VPS for developers, small teams and agencies: SSH keys only, root locked out, firewall, Fail2Ban, automatic updates. Every change documented and reversible.">
-    <link rel="canonical" href="https://anghelobr.github.io/">
-    <meta property="og:title" content="Jaren Bailon — Linux server hardening">
-    <meta property="og:description" content="Your new VPS is wide open. I close it, and hand you the paper trail.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://anghelobr.github.io/">
-    <meta property="og:image" content="https://anghelobr.github.io/og.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <meta name="theme-color" content="#0b0d10" id="themeColor">
-    <script>
-        // Theme + language before first paint, so nothing flashes.
-        (function () {
-            var d = document.documentElement; d.classList.add('js');
-            // If site.js never runs, don't leave scroll-reveal content invisible.
-            setTimeout(function () { if (!window.__siteJs) d.classList.add('reveal-fallback'); }, 2500);
-            try {
-                var t = localStorage.getItem('theme');
-                if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-                d.setAttribute('data-theme', t);
-                var m = document.getElementById('themeColor'); if (m) m.setAttribute('content', t === 'light' ? '#f2f3f5' : '#0b0d10');
-                var l = localStorage.getItem('lang');
-                if (!l) l = (navigator.language || '').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
-                d.setAttribute('lang', l);
-            } catch (e) {}
-        })();
-    </script>
-    <link rel="preload" href="assets/fonts/bricolage-grotesque-var.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="assets/fonts/ibm-plex-sans-var.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="assets/fonts.css">
-    <link rel="stylesheet" href="assets/site.css">
-    <link rel="stylesheet" href="assets/home.css">
-</head>
-<body>
+---
+layout: base
+lang: en
+i18n: true
+reveal: true
+title: "Jaren Bailon — Linux server hardening"
+og_title: "Jaren Bailon — Linux server hardening"
+description: "I harden Linux VPS for developers, small teams and agencies: SSH keys only, root locked out, firewall, Fail2Ban, automatic updates. Every change documented and reversible."
+og_description: "Your new VPS is wide open. I close it, and hand you the paper trail."
+og_type: website
+css: [/assets/home.css]
+js: [/assets/site.js, /assets/home.js, /assets/scene.js]
+---
 
 <nav class="nav">
     <div class="container nav-inner">
@@ -324,36 +295,15 @@
         </div>
 
         <div class="labs-grid" id="labsGrid">
-            <a href="lab-003-hardening.html" class="lab-card flagship reveal" data-tags="debian lab security hardening">
-                <div class="lab-top"><span class="lab-file">lab-003-hardening.html</span><span class="lab-type t-lab">Lab 003</span></div>
-                <h3 class="lab-title" data-i18n="lab003.t">Hardening Debian</h3>
-                <p class="lab-desc" data-i18n="lab003.d">Initial hardening checklist for a Debian 13 server: users, sudo, SSH, firewall and automatic updates. The base of the Basic tier.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>security</span><span>hardening</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
+{%- assign cards = site.labs | sort: "card_order" %}
+{%- for l in cards %}
+            <a href="{{ l.url | relative_url }}" class="lab-card{% if l.card_flagship %} flagship{% endif %} reveal" data-tags="{{ l.card_filters }}">
+                <div class="lab-top"><span class="lab-file">{{ l.url | remove_first: "/" }}</span><span class="lab-type{% if l.card_is_lab %} t-lab{% endif %}">{{ l.card_type }}</span></div>
+                <h3 class="lab-title" data-i18n="card.{{ l.slug }}.t">{{ l.card_title }}</h3>
+                <p class="lab-desc" data-i18n="card.{{ l.slug }}.d">{{ l.card_desc }}</p>
+                <div class="lab-foot"><div class="lab-tags">{% for t in l.card_tags %}<span>{{ t }}</span>{% endfor %}</div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
             </a>
-            <a href="lab-002-vpn.html" class="lab-card reveal" data-tags="debian lab security networking vpn wireguard">
-                <div class="lab-top"><span class="lab-file">lab-002-vpn.html</span><span class="lab-type t-lab">Lab 002</span></div>
-                <h3 class="lab-title" data-i18n="lab002.t">VPN PC → VPS with WireGuard</h3>
-                <p class="lab-desc" data-i18n="lab002.d">A direct WireGuard tunnel from your PC to a public-IP VPS. No router involved.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>wireguard</span><span>vpn</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
-            </a>
-            <a href="lab-001-dns.html" class="lab-card reveal" data-tags="debian lab dns networking">
-                <div class="lab-top"><span class="lab-file">lab-001-dns.html</span><span class="lab-type t-lab">Lab 001</span></div>
-                <h3 class="lab-title" data-i18n="lab001.t">Fix DNS on Debian</h3>
-                <p class="lab-desc" data-i18n="lab001.d">Resolving “Temporary failure in name resolution” with a sane /etc/resolv.conf, and the permanent fix with systemd-resolved.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>dns</span><span>networking</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
-            </a>
-            <a href="lab-004-nas.html" class="lab-card reveal" data-tags="debian lab networking nas storage">
-                <div class="lab-top"><span class="lab-file">lab-004-nas.html</span><span class="lab-type t-lab">Lab 004</span></div>
-                <h3 class="lab-title" data-i18n="lab004.t">Home NAS</h3>
-                <p class="lab-desc" data-i18n="lab004.d">A simple NAS with Debian + Samba to share files across your LAN and homelab.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>samba</span><span>storage</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
-            </a>
-            <a href="debian-13-sources.html" class="lab-card reveal" data-tags="debian repos apt config">
-                <div class="lab-top"><span class="lab-file">debian-13-sources.html</span><span class="lab-type" data-i18n="type.config">Config</span></div>
-                <h3 class="lab-title" data-i18n="labsrc.t">Debian 13 sources.list</h3>
-                <p class="lab-desc" data-i18n="labsrc.d">Recommended /etc/apt/sources.list for Trixie: main, contrib, non-free, firmware and backports.</p>
-                <div class="lab-foot"><div class="lab-tags"><span>debian</span><span>apt</span></div><span class="lab-go" data-i18n="lab.go">Read →</span></div>
-            </a>
+{%- endfor %}
         </div>
         <div class="labs-empty" data-i18n="labs.empty">Nothing here yet for that filter.</div>
     </div>
@@ -433,9 +383,11 @@
         </div>
     </div>
 </footer>
-
-<script src="assets/site.js" defer></script>
-<script src="assets/home.js" defer></script>
-<script src="assets/scene.js" defer></script>
-</body>
-</html>
+<script>
+    window.__labsEs = {
+{%- for l in site.labs %}
+        "card.{{ l.slug }}.t": {{ l.card_title_es | jsonify }},
+        "card.{{ l.slug }}.d": {{ l.card_desc_es | jsonify }}{% unless forloop.last %},{% endunless %}
+{%- endfor %}
+    };
+</script>

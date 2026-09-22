@@ -1,0 +1,9 @@
+{% include head.html %}
+<body>
+{{ content }}
+{%- assign scripts = page.js | default: layout.js %}
+{%- for js in scripts %}
+<script src="{{ js | relative_url }}" defer></script>
+{%- endfor %}
+</body>
+</html>
