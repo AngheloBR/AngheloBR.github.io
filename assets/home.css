@@ -29,7 +29,8 @@
 .hero-distros { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-family: var(--font-mono); font-size: 12px; color: var(--mute); }
 .hero-distros span { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--dim); }
 .hero-distros span::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--d, var(--mute)); }
-.d-debian { --d: #d70a53; } .d-ubuntu { --d: #e95420; } .d-rocky { --d: #10b981; } .d-alma { --d: #0069da; } .d-fedora { --d: #51a2da; }
+.d-debian { --d: #d70a53; } .d-ubuntu { --d: #e95420; } .d-rocky { --d: #10b981; } .d-alma { --d: #0069da; }
+.hero-distros span.d-other { border-style: dashed; color: var(--mute); } .d-other::before { display: none; }
 
 /* page-load stagger */
 .js .hero-in > * { opacity: 0; transform: translateY(14px); animation: rise .8s var(--ease) forwards; }

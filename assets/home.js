@@ -10,7 +10,7 @@
         'hero.h1': 'Tu VPS nuevo está abierto de par en par.',
         'hero.h2': 'Yo lo cierro, y te entrego cada cambio por escrito.',
         'hero.sub': 'Solo llaves SSH, root bloqueado, firewall activo, Fail2Ban vigilando, parches de seguridad automáticos. <strong>Cada cambio va a un PDF</strong> que puedes auditar, revertir o repetir dentro de dos años.',
-        'hero.cta1': 'Contrátame en Fiverr', 'hero.cta2': 'Ver qué cambia',
+        'hero.cta1': 'Contrátame en Fiverr', 'hero.cta2': 'Ver qué cambia', 'distro.other': '¿Otra distro? Pregunta primero',
         'hud.title': 'Lo que ve un servidor endurecido', 'hud.title.stock': 'Lo que ve un servidor de fábrica',
         'scene.stock.label': '· config de fábrica', 'scene.hardened.label': '· endurecido',
         'scene.sw.stock': 'fábrica', 'scene.sw.hardened': 'endurecido', 'scene.harden': 'Endurecer este servidor',
