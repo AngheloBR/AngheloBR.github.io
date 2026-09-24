@@ -246,21 +246,23 @@ js: [/assets/site.js, /assets/home.js, /assets/scene.js]
                 </ul>
                 <a href="https://fiverr.com/jaren_anghelo" class="btn btn-primary" target="_blank" rel="noopener" data-i18n="tier.cta">Order on Fiverr</a>
             </div>
-            <div class="tier reveal">
+            <div class="tier tier-soon reveal">
+                <div class="tier-flag tier-flag-soon" data-i18n="tier.soon">Coming soon</div>
                 <div class="tier-name">Premium <span class="tier-alias" data-i18n="tier.prem.alias">· Audited</span></div>
                 <div class="tier-price"><small>$</small>150</div>
-                <div class="tier-meta"><span data-i18n="tier.prem.eta">3-day delivery</span></div>
+                <div class="tier-meta"><span data-i18n="tier.prem.eta">in testing</span></div>
                 <p class="tier-desc" data-i18n="tier.prem">A small business that needs proof it was done right.</p>
                 <ul class="tier-features">
                     <li data-i18n="feat.std">Everything in Standard</li>
-                    <li data-i18n="feat.audit">Lynis audit before and after, with score</li>
-                    <li data-i18n="feat.ids">rkhunter + auditd</li>
-                    <li data-i18n="feat.logwatch">Daily logwatch summary by email</li>
-                    <li data-i18n="feat.tls">Nginx/Caddy reverse proxy with TLS (Let's Encrypt)</li>
+                    <li data-i18n="feat.audit">Lynis audit before and after, score on the report</li>
+                    <li data-i18n="feat.lynisfix">Safe fixes for Lynis findings</li>
+                    <li data-i18n="feat.auditd">auditd: who changed users, sudo, SSH, cron</li>
+                    <li data-i18n="feat.aide">File integrity check (AIDE), daily</li>
+                    <li data-i18n="feat.logwatch">Daily security summary on the server</li>
                     <li data-i18n="feat.2fa">SSH 2FA (TOTP), optional</li>
                     <li data-i18n="feat.warranty">14-day post-delivery support</li>
                 </ul>
-                <a href="https://fiverr.com/jaren_anghelo" class="btn btn-secondary" target="_blank" rel="noopener" data-i18n="tier.cta">Order on Fiverr</a>
+                <span class="btn btn-secondary btn-disabled" aria-disabled="true" data-i18n="tier.soon.cta">Not available yet</span>
             </div>
         </div>
 
@@ -269,7 +271,6 @@ js: [/assets/site.js, /assets/home.js, /assets/scene.js]
             <ul class="extras-list">
                 <li><b>+$25</b><span data-i18n="extra.server">Additional server</span></li>
                 <li><b>+$15</b><span data-i18n="extra.express">24-hour express delivery</span></li>
-                <li><b>+$20</b><span data-i18n="extra.lynis">Lynis audit on its own</span></li>
                 <li class="hot"><b>$30<small data-i18n="extra.mo">/mo</small></b><span data-i18n="extra.maint">Monthly maintenance: updates, log review, re-audit</span></li>
             </ul>
         </div>

@@ -274,3 +274,10 @@
 .changes-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .callout { padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); border-left: 3px solid var(--amber); border-radius: var(--radius); background: var(--amber-soft); font-size: 14.5px; line-height: 1.6; color: var(--dim); }
 .callout b { color: var(--text); font-weight: 600; display: block; margin-bottom: 4px; }
+
+/* Premium while it is being built and tested: visible, not orderable */
+.tier-soon { opacity: .82; }
+.tier-soon .tier-price { color: var(--dim); }
+.tier-flag-soon { background: var(--panel-2); color: var(--dim); border: 1px solid var(--line-2); }
+.btn-disabled { cursor: not-allowed; color: var(--mute); border-style: dashed; justify-content: center; }
+.btn-disabled:hover { color: var(--mute); border-color: var(--line-2); }
